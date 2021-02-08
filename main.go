@@ -1,6 +1,12 @@
 package type_your_song
 
-import "github.com/arman-aminian/type-your-song/router"
+import (
+	"github.com/arman-aminian/type-your-song/db"
+	"github.com/arman-aminian/type-your-song/handler"
+	"github.com/arman-aminian/type-your-song/router"
+	"github.com/arman-aminian/type-your-song/store"
+	"log"
+)
 
 func main() {
 	r := router.New()
@@ -9,12 +15,14 @@ func main() {
 	//
 	v1 := r.Group("/api")
 	//
-	//d := db.New()
-	//db.AutoMigrate(d)
-	//
-	//us := store.NewUserStore(d)
-	//as := store.NewArticleStore(d)
-	//h := handler.NewHandler(us, as)
-	//h.Register(v1)
-	//r.Logger.Fatal(r.Start("127.0.0.1:8585"))
+	mongoClient, err := db.GetMongoClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	usersDb := db.SetupUsersDb(mongoClient)
+	us := store.NewUserStore(usersDb)
+	h := handler.NewHandler(us)
+
+	h.Register(v1)
+	r.Logger.Fatal(r.Start("127.0.0.1:8585"))
 }
