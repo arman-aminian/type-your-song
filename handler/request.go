@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/labstack/echo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Registration request
@@ -30,6 +31,7 @@ func (r *userRegisterRequest) bind(c echo.Context, u *model.User) error {
 		return err
 	}
 	u.Password = h
+	u.ID = primitive.NewObjectID()
 	return nil
 }
 

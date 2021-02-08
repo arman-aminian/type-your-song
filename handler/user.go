@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/arman-aminian/type-your-song/utils"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 	"net/http"
 )
 

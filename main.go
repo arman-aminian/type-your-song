@@ -1,4 +1,4 @@
-package type_your_song
+package main
 
 import (
 	"github.com/arman-aminian/type-your-song/db"
