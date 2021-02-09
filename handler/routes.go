@@ -18,4 +18,5 @@ func (h *Handler) Register(v1 *echo.Group) {
 
 	dummy := v1.Group("/dummy", jwtMiddleware)
 	dummy.GET("", h.Dummy)
+
 }
