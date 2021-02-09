@@ -5,6 +5,7 @@ import (
 	"github.com/arman-aminian/type-your-song/handler"
 	"github.com/arman-aminian/type-your-song/router"
 	"github.com/arman-aminian/type-your-song/store"
+	"github.com/arman-aminian/type-your-song/utils"
 	"log"
 )
 
@@ -25,6 +26,6 @@ func main() {
 	h := handler.NewHandler(us)
 
 	h.Register(v1)
-	r.Logger.Fatal(r.Start("127.0.0.1:8585"))
+	r.Logger.Fatal(r.Start(utils.BaseUrl))
 
 }

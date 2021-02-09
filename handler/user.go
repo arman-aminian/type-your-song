@@ -31,18 +31,20 @@ func (h *Handler) SignUp(c echo.Context) error {
 	to := []string{
 		u.Email,
 	}
-	err = email.SendEmail(to, emailJwt)
+	content := utils.BaseUrl + "/api/confirm?query=" + emailJwt
+	err = email.SendEmail(to, content)
 	if err != nil {
 		panic(err)
 	}
 
-	return c.JSON(http.StatusCreated, model.Message{Content: "confirm your email"})
+	return c.JSON(http.StatusCreated, model.Message{Content: "an email sent to you\nconfirm your email address"})
 }
 
 func (h *Handler) ConfirmEmail(c echo.Context) error {
 	var u model.User
 	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
 	if err != nil {
+		fmt.Println("here")
 		return err
 	}
 	u.ID = id
@@ -51,6 +53,7 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 	u.Email = stringFieldFromToken(c, "email")
 	u.Password = stringFieldFromToken(c, "password")
 
+	// todo error handling for duplicate click on confirm email
 	if err := h.userStore.Create(&u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}

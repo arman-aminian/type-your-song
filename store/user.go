@@ -61,6 +61,6 @@ func (us *UserStore) GetByEmail(email string) (*model.User, error) {
 
 func (us *UserStore) GetByUsername(username string) (*model.User, error) {
 	var u model.User
-	err := us.db.FindOne(context.TODO(), bson.M{"_id": username}).Decode(&u)
+	err := us.db.FindOne(context.TODO(), bson.M{"username": username}).Decode(&u)
 	return &u, err
 }
