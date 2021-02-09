@@ -6,6 +6,7 @@ import (
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/arman-aminian/type-your-song/utils"
 	"github.com/labstack/echo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
@@ -32,13 +33,18 @@ func (h *Handler) SignUp(c echo.Context) error {
 }
 
 func (h *Handler) ConfirmEmail(c echo.Context) error {
-	id := stringFieldFromToken(c, "id")
-	name := stringFieldFromToken(c, "name")
-	username := stringFieldFromToken(c, "username")
-	email := stringFieldFromToken(c, "email")
-	pass := stringFieldFromToken(c, "password")
+	var u model.User
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		return err
+	}
+	u.ID = id
+	u.Name = stringFieldFromToken(c, "name")
+	u.Username = stringFieldFromToken(c, "username")
+	u.Email = stringFieldFromToken(c, "email")
+	u.Password = stringFieldFromToken(c, "password")
 
-	return c.JSON(http.StatusCreated, email)
+	return c.JSON(http.StatusCreated, newUserResponse(&u))
 }
 
 func (h *Handler) Login(c echo.Context) error {
