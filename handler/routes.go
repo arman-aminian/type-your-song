@@ -12,6 +12,10 @@ func (h *Handler) Register(v1 *echo.Group) {
 	guestUsers.POST("", h.SignUp)
 	guestUsers.POST("/login", h.Login)
 
+	confirmEmailJwtMiddleware := middleware.EmailConfirmJWT(utils.JWTSecret)
+	confirmEmail := v1.Group("/confirm", confirmEmailJwtMiddleware)
+	confirmEmail.POST("", h.ConfirmEmail)
+
 	dummy := v1.Group("/dummy", jwtMiddleware)
 	dummy.GET("", h.Dummy)
 }

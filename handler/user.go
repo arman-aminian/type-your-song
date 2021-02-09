@@ -18,7 +18,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 
 	emailJwt := utils.GenerateEmailConfirmJWT(u)
 	to := []string{
-		"arman.aminian78@gmail.com",
+		u.Email,
 	}
 	err := email.SendEmail(to, emailJwt)
 	if err != nil {
@@ -31,9 +31,15 @@ func (h *Handler) SignUp(c echo.Context) error {
 	return c.JSON(http.StatusCreated, newUserResponse(&u))
 }
 
-//func (h *Handler) ConfirmEmail(c echo.Context) error {
-//
-//}
+func (h *Handler) ConfirmEmail(c echo.Context) error {
+	id := stringFieldFromToken(c, "id")
+	name := stringFieldFromToken(c, "name")
+	username := stringFieldFromToken(c, "username")
+	email := stringFieldFromToken(c, "email")
+	pass := stringFieldFromToken(c, "password")
+
+	return c.JSON(http.StatusCreated, email)
+}
 
 func (h *Handler) Login(c echo.Context) error {
 	username := c.Param("user")
@@ -57,4 +63,12 @@ func (h *Handler) Login(c echo.Context) error {
 
 func (h *Handler) Dummy(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "hello world")
+}
+
+func stringFieldFromToken(c echo.Context, field string) string {
+	field, ok := c.Get(field).(string)
+	if !ok {
+		return ""
+	}
+	return field
 }
