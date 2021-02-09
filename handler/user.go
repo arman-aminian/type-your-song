@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"github.com/arman-aminian/type-your-song/email"
 	"github.com/arman-aminian/type-your-song/model"
@@ -17,19 +18,25 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
+	_, err := h.userStore.GetByUsername(u.Username)
+	if err == nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("duplicate username ")))
+	}
+	_, err = h.userStore.GetByEmail(u.Email)
+	if err == nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("duplicate email ")))
+	}
+
 	emailJwt := utils.GenerateEmailConfirmJWT(u)
 	to := []string{
 		u.Email,
 	}
-	err := email.SendEmail(to, emailJwt)
+	err = email.SendEmail(to, emailJwt)
 	if err != nil {
 		panic(err)
 	}
 
-	if err := h.userStore.Create(&u); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
-	}
-	return c.JSON(http.StatusCreated, newUserResponse(&u))
+	return c.JSON(http.StatusCreated, model.Message{Content: "confirm your email"})
 }
 
 func (h *Handler) ConfirmEmail(c echo.Context) error {
@@ -44,6 +51,9 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 	u.Email = stringFieldFromToken(c, "email")
 	u.Password = stringFieldFromToken(c, "password")
 
+	if err := h.userStore.Create(&u); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
 	return c.JSON(http.StatusCreated, newUserResponse(&u))
 }
 
