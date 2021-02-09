@@ -31,7 +31,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 	to := []string{
 		u.Email,
 	}
-	content := utils.BaseUrl + "/api/confirm?query=" + emailJwt
+	content := utils.BaseUrl + "/api/confirm?token=" + emailJwt
 	err = email.SendEmail(to, content)
 	if err != nil {
 		panic(err)
@@ -44,7 +44,6 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 	var u model.User
 	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
 	if err != nil {
-		fmt.Println("here")
 		return err
 	}
 	u.ID = id
@@ -61,8 +60,6 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 }
 
 func (h *Handler) Login(c echo.Context) error {
-	username := c.Param("user")
-	fmt.Println("id :", username)
 	req := &userLoginRequest{}
 	if err := req.bind(c); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
@@ -78,6 +75,27 @@ func (h *Handler) Login(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 	return c.JSON(http.StatusOK, newUserResponse(u))
+}
+
+func (h *Handler) ResetPass(c echo.Context) error {
+	e := c.QueryParam("email")
+	fmt.Println("email :", e)
+	u, err := h.userStore.GetByEmail(e)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NotFound())
+	}
+	//email := stringFieldFromToken(c, "email")
+
+	emailJwt := utils.GenerateEmailConfirmJWT(*u)
+	to := []string{
+		e,
+	}
+	content := utils.BaseUrl + "/api/reset/confirm?token=" + emailJwt
+	err = email.SendEmail(to, content)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("try again")))
+	}
+	return c.JSON(http.StatusCreated, model.Message{Content: "reset your password in the email we sent to you"})
 }
 
 func (h *Handler) Dummy(c echo.Context) error {

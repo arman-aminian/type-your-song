@@ -34,7 +34,7 @@ func EmailConfirmJWTWithConfig(config EmailConfirmJWTConfig) echo.MiddlewareFunc
 	//extractor := jwtFromHeader("Authorization", "Token")
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			auth := c.QueryParam("query")
+			auth := c.QueryParam("token")
 			println("auth :", auth)
 			if auth == "" {
 				if config.Skipper != nil {
