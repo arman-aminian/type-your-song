@@ -7,12 +7,10 @@ import (
 
 type userResponse struct {
 	User struct {
-		Username       string `json:"username" bson:"_id"`
-		Email          string `json:"email"`
-		Name           string `json:"name"`
-		Bio            string `json:"bio"`
-		ProfilePicture string `json:"profile_picture"`
-		Token          string `json:"token"`
+		Username string `json:"username" bson:"_id"`
+		Email    string `json:"email"`
+		Name     string `json:"name"`
+		Token    string `json:"token"`
 	} `json:"user"`
 }
 
@@ -27,10 +25,8 @@ func newUserResponse(u *model.User) *userResponse {
 
 type profileResponse struct {
 	Profile struct {
-		Username  string  `json:"username"`
-		Bio       *string `json:"bio"`
-		Image     *string `json:"image"`
-		Following bool    `json:"following"`
+		Username string  `json:"username"`
+		Image    *string `json:"image"`
 	} `json:"profile"`
 }
 
