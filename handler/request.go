@@ -51,3 +51,17 @@ func (r *userLoginRequest) bind(c echo.Context) error {
 	}
 	return nil
 }
+
+type resetPasswordRequest struct {
+	NewPassword string `json:"new_password"`
+}
+
+func (r *resetPasswordRequest) bind(c echo.Context) error {
+	if err := c.Bind(r); err != nil {
+		return err
+	}
+	if err := c.Validate(r); err != nil {
+		return err
+	}
+	return nil
+}

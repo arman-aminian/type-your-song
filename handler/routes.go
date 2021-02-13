@@ -16,9 +16,9 @@ func (h *Handler) Register(v1 *echo.Group) {
 	confirmEmail := v1.Group("/confirm", confirmEmailJwtMiddleware)
 	confirmEmail.GET("", h.ConfirmEmail)
 
-	//resetPassJwtMiddleware := middleware.ResetPassJWT(utils.JWTSecret)
-	//resetPass := v1.Group("/reset", resetPassJwtMiddleware)
-	//resetPass.GET("/confirm", h.ResetPass)
+	resetPassJwtMiddleware := middleware.ResetPassJWT(utils.JWTSecret)
+	resetPass := v1.Group("/reset", resetPassJwtMiddleware)
+	resetPass.GET("/confirm", h.ConfirmResetPass)
 
 	jwtMiddleware := middleware.JWT(utils.JWTSecret)
 	dummy := v1.Group("/dummy", jwtMiddleware)

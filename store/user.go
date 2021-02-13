@@ -27,16 +27,9 @@ func (us *UserStore) Remove(field, value string) error {
 	return err
 }
 
-func (us *UserStore) Update(old *model.User, new *model.User) error {
+func (us *UserStore) Update(old *model.User, field string, value string) error {
 	var err error
-	if old.Username != new.Username {
-		err = us.Remove("_id", old.Username)
-	} else if old.Email != new.Email {
-		err = us.Remove("email", old.Email)
-	} else if old.Password != new.Password {
-		err = us.Remove("password", old.Password)
-	}
-	err = us.Create(new)
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": old.ID}, bson.M{"$set": bson.M{field: value}})
 	return err
 }
 

@@ -58,7 +58,6 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, newUserResponse(&u))
 }
-
 func (h *Handler) Login(c echo.Context) error {
 	req := &userLoginRequest{}
 	if err := req.bind(c); err != nil {
@@ -96,6 +95,28 @@ func (h *Handler) ResetPass(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("try again")))
 	}
 	return c.JSON(http.StatusCreated, model.Message{Content: "reset your password in the email we sent to you"})
+}
+
+func (h *Handler) ConfirmResetPass(c echo.Context) error {
+	req := &resetPasswordRequest{}
+	if err := req.bind(c); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	e := stringFieldFromToken(c, "email")
+	u, err := h.userStore.GetByEmail(e)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
+	}
+
+	// todo error handling for duplicate click on confirm reset password
+	if err := h.userStore.Update(u, "password", req.NewPassword); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	u.Password = req.NewPassword
+	return c.JSON(http.StatusCreated, newUserResponse(u))
 }
 
 func (h *Handler) Dummy(c echo.Context) error {
