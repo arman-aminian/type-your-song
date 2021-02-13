@@ -102,6 +102,7 @@ func (h *Handler) ConfirmResetPass(c echo.Context) error {
 	if err := req.bind(c); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
+
 	e := stringFieldFromToken(c, "email")
 	u, err := h.userStore.GetByEmail(e)
 	if err != nil {
@@ -110,12 +111,16 @@ func (h *Handler) ConfirmResetPass(c echo.Context) error {
 	if u == nil {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
+	hashedPass, err := u.HashPassword(req.NewPassword)
+	if err != nil {
+		return err
+	}
 
 	// todo error handling for duplicate click on confirm reset password
-	if err := h.userStore.Update(u, "password", req.NewPassword); err != nil {
+	if err := h.userStore.Update(u, "password", hashedPass); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-	u.Password = req.NewPassword
+	u.Password = hashedPass
 	return c.JSON(http.StatusCreated, newUserResponse(u))
 }
 
