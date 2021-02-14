@@ -10,6 +10,8 @@ func (h *Handler) Register(v1 *echo.Group) {
 	guestUsers := v1.Group("/users")
 	guestUsers.POST("", h.SignUp)
 	guestUsers.POST("/login", h.Login)
+	guestUsers.GET("/login/google", h.GoogleLogin)
+	guestUsers.GET("/callback", h.GoogleLoginCallback)
 	guestUsers.POST("/reset", h.ResetPass)
 
 	confirmEmailJwtMiddleware := middleware.EmailConfirmJWT(utils.JWTSecret)

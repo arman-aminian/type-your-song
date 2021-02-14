@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/arman-aminian/type-your-song/db"
-	"github.com/arman-aminian/type-your-song/email"
 	"github.com/arman-aminian/type-your-song/handler"
 	"github.com/arman-aminian/type-your-song/router"
 	"github.com/arman-aminian/type-your-song/store"
@@ -16,14 +15,14 @@ func main() {
 	//
 	//
 
-	to := []string{
-		"arman.aminian78@gmail.com",
-	}
-	content := "https://github.com"
-	err := email.SendEmail(to, content, "confirm your typeasong account")
-	if err != nil {
-		panic(err)
-	}
+	//to := []string{
+	//	"arman.aminian78@gmail.com",
+	//}
+	//content := "https://github.com"
+	//err := email.SendEmail(to, content, "confirm your typeasong account")
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	r := router.New()
 	v1 := r.Group("/api")
