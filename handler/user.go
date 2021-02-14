@@ -12,7 +12,6 @@ import (
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 func (h *Handler) SignUp(c echo.Context) error {
@@ -81,20 +80,16 @@ func (h *Handler) Login(c echo.Context) error {
 }
 
 var (
-	googleOauthConfig *oauth2.Config
-	// TODO: randomize it
-	oauthStateString = "pseudo-random"
-)
-
-func init() {
 	googleOauthConfig = &oauth2.Config{
 		RedirectURL:  "http://localhost:8080/callback",
-		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		ClientID:     "988996445182-6p95jh58g5kk1g0ecgn43gim0fnrvm40.apps.googleusercontent.com",
+		ClientSecret: "vDdYMfEcajTBqKr6L0wqDESa",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
-}
+	// TODO: randomize it
+	oauthStateString = "pseudo-random"
+)
 
 func (h *Handler) GoogleLogin(c echo.Context) error {
 	url := googleOauthConfig.AuthCodeURL(oauthStateString)
