@@ -32,7 +32,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 		u.Email,
 	}
 	content := utils.BaseUrl + "/api/confirm?token=" + emailJwt
-	err = email.SendEmail(to, content)
+	err = email.SendEmail(to, content, "confirm your typeasong account")
 	if err != nil {
 		panic(err)
 	}
@@ -90,7 +90,7 @@ func (h *Handler) ResetPass(c echo.Context) error {
 		e,
 	}
 	content := utils.BaseUrl + "/api/reset/confirm?token=" + emailJwt
-	err = email.SendEmail(to, content)
+	err = email.SendEmail(to, content, "reset password - typeasong")
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("try again")))
 	}

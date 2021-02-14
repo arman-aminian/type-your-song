@@ -8,7 +8,7 @@ import (
 	"text/template"
 )
 
-func SendEmail(to []string, text string) error {
+func SendEmail(to []string, text, subject string) error {
 	// Sender data.
 	from := "typeyoursong@gmail.com"
 	password := secure.EmailPassword
@@ -25,19 +25,19 @@ func SendEmail(to []string, text string) error {
 	// Authentication.
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
-	t, _ := template.ParseFiles("./email/template.html")
+	t, _ := template.ParseFiles("./email/email_confirm_template.html")
 
 	var body bytes.Buffer
 
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("Subject: This is a test subject \n%s\n\n", mimeHeaders)))
+	body.Write([]byte(fmt.Sprintf("Subject: %s \n%s\n\n", subject, mimeHeaders)))
 
 	err := t.Execute(&body, struct {
-		Name    string
-		Message string
+		Product string
+		Link    string
 	}{
-		Name:    "Type A Song",
-		Message: text,
+		Product: "Type A Song",
+		Link:    text,
 	})
 
 	if err != nil {
