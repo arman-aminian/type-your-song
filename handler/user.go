@@ -6,6 +6,7 @@ import (
 	"github.com/arman-aminian/type-your-song/email"
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/arman-aminian/type-your-song/utils"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/oauth2"
@@ -88,11 +89,12 @@ var (
 		Endpoint:     google.Endpoint,
 	}
 	// TODO: randomize it
-	oauthStateString = "pseudo-random"
+	//oauthStateString = secure.OauthTokenSecret
 )
 
 func (h *Handler) GoogleLogin(c echo.Context) error {
-	url := googleOauthConfig.AuthCodeURL(oauthStateString)
+	token := utils.GenerateOauthToken()
+	url := googleOauthConfig.AuthCodeURL(token)
 	return c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
@@ -102,10 +104,20 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 		fmt.Println(err.Error())
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
+	fmt.Println("content : ", string(content))
 	return c.JSON(http.StatusOK, content)
 }
 func getUserInfo(state string, code string) ([]byte, error) {
-	if state != oauthStateString {
+	stateToken, err := jwt.Parse(state, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return utils.JWTSecret, nil
+	})
+	if err != nil {
+		return nil, fmt.Errorf("unexpected oauth state")
+	}
+	if !stateToken.Valid {
 		return nil, fmt.Errorf("invalid oauth state")
 	}
 

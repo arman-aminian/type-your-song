@@ -31,6 +31,14 @@ func GenerateEmailConfirmJWT(user model.User) string {
 	return t
 }
 
+func GenerateOauthToken() string {
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+	t, _ := token.SignedString(JWTSecret)
+	return t
+}
+
 func GenerateResetPassJWT(email string) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
