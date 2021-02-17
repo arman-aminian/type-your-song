@@ -24,12 +24,12 @@ func (h *Handler) SignUp(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
-	_, err := h.userStore.GetByUsername(u.Username)
-	if err == nil {
+	t, err := h.userStore.GetByUsername(u.Username)
+	if err == nil && t.HasPassword {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("duplicate username ")))
 	}
-	_, err = h.userStore.GetByEmail(u.Email)
-	if err == nil {
+	t, err = h.userStore.GetByEmail(u.Email)
+	if err == nil && t.HasPassword {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("duplicate email ")))
 	}
 
@@ -60,7 +60,7 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 
 	// todo error handling for duplicate click on confirm email
 	if err := h.userStore.Create(&u); err != nil {
-		if err = h.userStore.UpdateBoolField(&u, "has_password", true); err != nil {
+		if err = h.userStore.UpdateBoolFieldByEmail(&u, "has_password", true); err != nil {
 			return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 		}
 	}
@@ -74,12 +74,12 @@ func (h *Handler) Login(c echo.Context) error {
 	}
 	u, err := h.userStore.GetByEmail(req.User.Email)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+		return c.JSON(http.StatusForbidden, utils.NewError(err))
 	}
 	if u == nil {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
-	if !u.CheckPassword(req.User.Password) {
+	if !(u.CheckPassword(req.User.Password) && u.HasPassword) {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 	return c.JSON(http.StatusOK, newUserResponse(u))
