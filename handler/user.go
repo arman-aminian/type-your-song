@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/arman-aminian/type-your-song/email"
@@ -13,6 +14,7 @@ import (
 	"golang.org/x/oauth2/google"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func (h *Handler) SignUp(c echo.Context) error {
@@ -102,7 +104,28 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 	fmt.Println("content : ", string(content))
-	return c.JSON(http.StatusOK, content)
+
+	var req googleUserLoginRequest
+	err = json.Unmarshal(content, &req)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+
+	fmt.Println("email : ", req.Email)
+
+	u, err := h.userStore.GetByEmail(req.Email)
+	if err == nil && u != nil {
+		u.Username = strings.Split(u.Email, "@")[0]
+		return c.JSON(http.StatusOK, newUserResponse(u))
+	}
+	u.Email = req.Email
+	u.Username = strings.Split(u.Email, "@")[0]
+	u.ID = primitive.NewObjectID()
+
+	if err := h.userStore.Create(u); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	return c.JSON(http.StatusOK, newUserResponse(u))
 }
 func getUserInfo(state string, code string) ([]byte, error) {
 	stateToken, err := jwt.Parse(state, func(token *jwt.Token) (interface{}, error) {

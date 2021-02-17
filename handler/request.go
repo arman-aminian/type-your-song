@@ -40,6 +40,13 @@ type userLoginRequest struct {
 	} `json:"user"`
 }
 
+type googleUserLoginRequest struct {
+	//Content struct {
+	Email   string `json:"email" validate:"required,email"`
+	Picture string `json:"picture"`
+	//} `json:"content"`
+}
+
 func (r *userLoginRequest) bind(c echo.Context) error {
 	if err := c.Bind(r); err != nil {
 		return err
