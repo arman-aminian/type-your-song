@@ -63,6 +63,9 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 		if err = h.userStore.UpdateBoolFieldByEmail(&u, "has_password", true); err != nil {
 			return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 		}
+		if err = h.userStore.UpdateStrFieldByEmail(&u, "username", u.Username); err != nil {
+			return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+		}
 	}
 	return c.JSON(http.StatusCreated, newUserResponse(&u))
 }
@@ -116,7 +119,6 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 
 	u, err := h.userStore.GetByEmail(req.Email)
 	if err == nil && u != nil {
-		u.Username = strings.Split(u.Email, "@")[0]
 		return c.JSON(http.StatusOK, newUserResponse(u))
 	}
 	if err != nil {

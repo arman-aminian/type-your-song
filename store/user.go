@@ -33,6 +33,18 @@ func (us *UserStore) UpdateStrField(old *model.User, field string, value string)
 	return err
 }
 
+func (us *UserStore) UpdateStrFieldByEmail(old *model.User, field string, value string) error {
+	var err error
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"email": old.Email}, bson.M{"$set": bson.M{field: value}})
+	return err
+}
+
+func (us *UserStore) UpdateBoolField(old *model.User, field string, value bool) error {
+	var err error
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": old.ID}, bson.M{"$set": bson.M{field: value}})
+	return err
+}
+
 func (us *UserStore) UpdateBoolFieldByEmail(old *model.User, field string, value bool) error {
 	var err error
 	_, err = us.db.UpdateOne(context.TODO(), bson.M{"email": old.Email}, bson.M{"$set": bson.M{field: value}})
