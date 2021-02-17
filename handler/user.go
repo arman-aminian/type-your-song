@@ -51,7 +51,6 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 		return err
 	}
 	u.ID = id
-	u.Name = stringFieldFromToken(c, "name")
 	u.Username = stringFieldFromToken(c, "username")
 	u.Email = stringFieldFromToken(c, "email")
 	u.Password = stringFieldFromToken(c, "password")
@@ -82,14 +81,12 @@ func (h *Handler) Login(c echo.Context) error {
 
 var (
 	googleOauthConfig = &oauth2.Config{
-		RedirectURL:  "http://localhost:8080/callback",
+		RedirectURL:  "http://localhost:8080/api/users/callback",
 		ClientID:     "988996445182-6p95jh58g5kk1g0ecgn43gim0fnrvm40.apps.googleusercontent.com",
 		ClientSecret: "vDdYMfEcajTBqKr6L0wqDESa",
 		Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email"},
 		Endpoint:     google.Endpoint,
 	}
-	// TODO: randomize it
-	//oauthStateString = secure.OauthTokenSecret
 )
 
 func (h *Handler) GoogleLogin(c echo.Context) error {

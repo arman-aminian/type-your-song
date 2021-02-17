@@ -9,7 +9,6 @@ import (
 // Registration request
 type userRegisterRequest struct {
 	User struct {
-		Name     string `json:"name" validate:"required"`
 		Username string `json:"username" bson:"_id" validate:"required"`
 		Email    string `json:"email" validate:"required,email"`
 		Password string `json:"password" validate:"required"`
@@ -23,7 +22,6 @@ func (r *userRegisterRequest) bind(c echo.Context, u *model.User) error {
 	if err := c.Validate(r); err != nil {
 		return err
 	}
-	u.Name = r.User.Name
 	u.Username = r.User.Username
 	u.Email = r.User.Email
 	h, err := u.HashPassword(r.User.Password)

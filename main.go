@@ -37,8 +37,8 @@ func main() {
 	h := handler.NewHandler(us)
 
 	r.GET("/", Temp)
-	r.GET("/login/google", h.GoogleLogin)
-	r.GET("/callback", h.GoogleLoginCallback)
+	//r.GET("/login/google", h.GoogleLogin)
+	//r.GET("/callback", h.GoogleLoginCallback)
 	h.Register(v1)
 	r.Logger.Fatal(r.Start(utils.BaseUrl))
 
@@ -47,7 +47,7 @@ func main() {
 func Temp(c echo.Context) error {
 	var htmlIndex = `<html>
 <body>
-	<a href="/login/google">Google Log In</a>
+	<a href="/api/users/login/google">Google Log In</a>
 </body>
 </html>`
 	return c.HTML(http.StatusTemporaryRedirect, htmlIndex)

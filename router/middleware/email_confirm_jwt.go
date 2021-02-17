@@ -56,8 +56,6 @@ func EmailConfirmJWTWithConfig(config EmailConfirmJWTConfig) echo.MiddlewareFunc
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				userID := claims["id"]
 				c.Set("id", userID)
-				userName := claims["name"]
-				c.Set("name", userName)
 				userUN := claims["username"]
 				c.Set("username", userUN)
 				userEmail := claims["email"]

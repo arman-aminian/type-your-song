@@ -22,7 +22,6 @@ func GenerateEmailConfirmJWT(user model.User) string {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = user.ID.Hex()
-	claims["name"] = user.Name
 	claims["username"] = user.Username
 	claims["email"] = user.Email
 	claims["password"] = user.Password

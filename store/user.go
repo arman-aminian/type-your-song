@@ -37,7 +37,7 @@ func (us *UserStore) UpdateProfile(u *model.User) error {
 	_, err := us.db.UpdateOne(context.TODO(),
 		bson.M{"_id": u.Username},
 		bson.M{"$set": bson.M{
-			"name": u.Name,
+			//"name": u.Name,
 			//"bio":             u.Bio,
 			//"profile_picture": u.ProfilePicture,
 			//"header_picture":  u.HeaderPicture,
