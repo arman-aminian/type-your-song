@@ -27,7 +27,13 @@ func (us *UserStore) Remove(field, value string) error {
 	return err
 }
 
-func (us *UserStore) Update(old *model.User, field string, value string) error {
+func (us *UserStore) UpdateStrField(old *model.User, field string, value string) error {
+	var err error
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": old.ID}, bson.M{"$set": bson.M{field: value}})
+	return err
+}
+
+func (us *UserStore) UpdateBoolField(old *model.User, field string, value bool) error {
 	var err error
 	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": old.ID}, bson.M{"$set": bson.M{field: value}})
 	return err

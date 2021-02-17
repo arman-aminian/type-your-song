@@ -56,13 +56,17 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 	u.Username = stringFieldFromToken(c, "username")
 	u.Email = stringFieldFromToken(c, "email")
 	u.Password = stringFieldFromToken(c, "password")
+	u.HasPassword = true
 
 	// todo error handling for duplicate click on confirm email
 	if err := h.userStore.Create(&u); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+		if err = h.userStore.UpdateBoolField(&u, "has_password", true); err != nil {
+			return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+		}
 	}
 	return c.JSON(http.StatusCreated, newUserResponse(&u))
 }
+
 func (h *Handler) Login(c echo.Context) error {
 	req := &userLoginRequest{}
 	if err := req.bind(c); err != nil {
@@ -103,7 +107,6 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 		fmt.Println(err.Error())
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
-	fmt.Println("content : ", string(content))
 
 	var req googleUserLoginRequest
 	err = json.Unmarshal(content, &req)
@@ -111,16 +114,18 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 
-	fmt.Println("email : ", req.Email)
-
 	u, err := h.userStore.GetByEmail(req.Email)
 	if err == nil && u != nil {
 		u.Username = strings.Split(u.Email, "@")[0]
 		return c.JSON(http.StatusOK, newUserResponse(u))
 	}
+	if err != nil {
+		fmt.Println(err)
+	}
 	u.Email = req.Email
 	u.Username = strings.Split(u.Email, "@")[0]
 	u.ID = primitive.NewObjectID()
+	u.HasPassword = false
 
 	if err := h.userStore.Create(u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
@@ -201,7 +206,7 @@ func (h *Handler) ConfirmResetPass(c echo.Context) error {
 	}
 
 	// todo error handling for duplicate click on confirm reset password
-	if err := h.userStore.Update(u, "password", hashedPass); err != nil {
+	if err := h.userStore.UpdateStrField(u, "password", hashedPass); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 	u.Password = hashedPass
