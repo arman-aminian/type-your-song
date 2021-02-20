@@ -11,8 +11,8 @@ type SongStore struct {
 	db *mongo.Collection
 }
 
-func NewSongStore(db *mongo.Collection) *UserStore {
-	return &UserStore{
+func NewSongStore(db *mongo.Collection) *SongStore {
+	return &SongStore{
 		db: db,
 	}
 }

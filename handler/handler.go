@@ -1,17 +1,18 @@
 package handler
 
 import (
+	"github.com/arman-aminian/type-your-song/song"
 	"github.com/arman-aminian/type-your-song/user"
 )
 
 type Handler struct {
 	userStore user.Store
-	//articleStore article.Store
+	songStore song.Store
 }
 
-func NewHandler(us user.Store) *Handler {
+func NewHandler(us user.Store, ss song.Store) *Handler {
 	return &Handler{
 		userStore: us,
-		//articleStore: as,
+		songStore: ss,
 	}
 }

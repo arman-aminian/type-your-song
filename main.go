@@ -33,15 +33,14 @@ func main() {
 		log.Fatal(err)
 	}
 	usersDb := db.SetupUsersDb(mongoClient)
+	songsDb := db.SetupSongsDb(mongoClient)
 	us := store.NewUserStore(usersDb)
-	h := handler.NewHandler(us)
+	ss := store.NewSongStore(songsDb)
+	h := handler.NewHandler(us, ss)
 
 	r.GET("/", Temp)
-	//r.GET("/login/google", h.GoogleLogin)
-	//r.GET("/callback", h.GoogleLoginCallback)
 	h.Register(v1)
 	r.Logger.Fatal(r.Start(utils.BaseUrl))
-
 }
 
 func Temp(c echo.Context) error {
