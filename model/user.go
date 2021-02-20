@@ -12,6 +12,7 @@ type User struct {
 	Email       string             `json:"email" bson:"email"`
 	Password    string             `json:"password" bson:"password"`
 	HasPassword bool               `json:"has_password" bson:"has_password"`
+	IsAdmin     bool               `json:"is_admin" bson:"is_admin"`
 }
 
 func NewUser() *User {

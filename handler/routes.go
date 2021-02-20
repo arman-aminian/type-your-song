@@ -23,6 +23,10 @@ func (h *Handler) Register(v1 *echo.Group) {
 	resetPass.GET("/confirm", h.ConfirmResetPass)
 
 	jwtMiddleware := middleware.JWT(utils.JWTSecret)
+
+	songs := v1.Group("/song", jwtMiddleware)
+	songs.POST("/add", h.AddSong)
+
 	dummy := v1.Group("/dummy", jwtMiddleware)
 	dummy.GET("", h.Dummy)
 

@@ -70,3 +70,9 @@ func (r *resetPasswordRequest) bind(c echo.Context) error {
 	}
 	return nil
 }
+
+//************************ songs ************************
+//type addSongRequest struct {
+//	Url	string `json:"url"`
+//
+//}
