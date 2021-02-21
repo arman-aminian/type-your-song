@@ -1,6 +1,9 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"github.com/arman-aminian/gosub/parsers"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Song struct {
 	Name        string                `json:"name" bson:"name"`
@@ -10,7 +13,7 @@ type Song struct {
 	Duration    int                   `json:"duration" bson:"duration"`
 	PassedUsers *[]primitive.ObjectID `json:"passed_users" bson:"passed_users"`
 	Url         string                `json:"url" bson:"url"`
-	//todo add lyric
+	Lyrics      parsers.Srt           `json:"lyrics" bson:"lyrics"`
 
 	MaxWPM     int `json:"max_wpm" bson:"max_wpm"`
 	AvgWPM     int `json:"avg_wpm" bson:"avg_wpm"`
