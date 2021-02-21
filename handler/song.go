@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	ggosub "github.com/arman-aminian/gosub"
+	"github.com/arman-aminian/gosub/parsers"
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/arman-aminian/type-your-song/utils"
 	"github.com/labstack/echo"
@@ -48,7 +49,9 @@ func (h *Handler) AddSong(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on parse subtitle")))
 	}
 	s.Lyrics = *srt
-	//todo calculate wpm
+	s.WordsCount = parsers.TotalWordCount(srt)
+	s.MaxWPM = parsers.CalculateMaxWpm(srt, 0, srt.Size)
+	s.AvgWPM = parsers.CalculateMeanWpm(srt, 0, srt.Size)
 
 	//todo modify return value
 	return c.JSON(http.StatusOK, "added")
