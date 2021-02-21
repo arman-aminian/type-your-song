@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/arman-aminian/type-your-song/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Store interface {
@@ -15,4 +16,5 @@ type Store interface {
 
 	GetByEmail(string) (*model.User, error)
 	GetByUsername(string) (*model.User, error)
+	GetById(primitive.ObjectID) (*model.User, error)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/arman-aminian/type-your-song/model"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -73,5 +74,11 @@ func (us *UserStore) GetByEmail(email string) (*model.User, error) {
 func (us *UserStore) GetByUsername(username string) (*model.User, error) {
 	var u model.User
 	err := us.db.FindOne(context.TODO(), bson.M{"username": username}).Decode(&u)
+	return &u, err
+}
+
+func (us *UserStore) GetById(id primitive.ObjectID) (*model.User, error) {
+	var u model.User
+	err := us.db.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&u)
 	return &u, err
 }

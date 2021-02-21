@@ -17,7 +17,7 @@ func newUserResponse(u *model.User) *userResponse {
 	r := new(userResponse)
 	r.User.Username = u.Username
 	r.User.Email = u.Email
-	r.User.Token = utils.GenerateJWT(u.ID.String())
+	r.User.Token = utils.GenerateJWT(u.ID.Hex())
 	return r
 }
 

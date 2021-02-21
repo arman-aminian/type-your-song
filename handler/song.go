@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	ggosub "github.com/arman-aminian/gosub"
 	"github.com/arman-aminian/gosub/parsers"
 	"github.com/arman-aminian/type-your-song/model"
@@ -14,7 +15,13 @@ import (
 )
 
 func (h *Handler) AddSong(c echo.Context) error {
-	u, err := h.userStore.GetByUsername(stringFieldFromToken(c, "id"))
+	println("user : " + stringFieldFromToken(c, "id"))
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	u, err := h.userStore.GetById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
@@ -52,7 +59,12 @@ func (h *Handler) AddSong(c echo.Context) error {
 	s.WordsCount = parsers.TotalWordCount(srt)
 	s.MaxWPM = parsers.CalculateMaxWpm(srt, 0, srt.Size)
 	s.AvgWPM = parsers.CalculateMeanWpm(srt, 0, srt.Size)
+	s.Score = calculateScore(s.WordsCount, s.MaxWPM, s.AvgWPM)
 
 	//todo modify return value
-	return c.JSON(http.StatusOK, "added")
+	return c.JSON(http.StatusOK, s)
+}
+func calculateScore(size, max, avg int) int {
+	t := (size / 1000) + (max / 300) + (avg / 200)
+	return t / 3 * 100
 }
