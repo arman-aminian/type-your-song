@@ -51,16 +51,17 @@ func (h *Handler) AddSong(c echo.Context) error {
 	}
 	s.Artist, err = primitive.ObjectIDFromHex(c.FormValue("artist"))
 	if err != nil {
-		//return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist not found")))
+		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist not found")))
 	}
+
 	s.Duration, err = strconv.Atoi(c.FormValue("duration"))
 	if err != nil {
-		//return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid duration")))
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid duration")))
 	}
 	s.PassedUsers = &[]primitive.ObjectID{}
 	s.Url = c.FormValue("url")
 	if s.Url == "" {
-		//return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid url")))
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid url")))
 	}
 	lyrics, err := c.FormFile("lyric")
 	if err != nil {
