@@ -34,9 +34,11 @@ func main() {
 	}
 	usersDb := db.SetupUsersDb(mongoClient)
 	songsDb := db.SetupSongsDb(mongoClient)
+	artistsDb := db.SetupArtistsDb(mongoClient)
 	us := store.NewUserStore(usersDb)
 	ss := store.NewSongStore(songsDb)
-	h := handler.NewHandler(us, ss)
+	as := store.NewArtistStore(artistsDb)
+	h := handler.NewHandler(us, ss, as)
 
 	r.GET("/", Temp)
 	h.Register(v1)

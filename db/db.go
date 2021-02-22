@@ -47,6 +47,11 @@ func SetupSongsDb(mongoClient *mongo.Client) *mongo.Collection {
 	return songsDB
 }
 
+func SetupArtistsDb(mongoClient *mongo.Client) *mongo.Collection {
+	songsDB := mongoClient.Database("type-your-song").Collection("artists")
+	return songsDB
+}
+
 func createUniqueIndices(db *mongo.Collection, field string) {
 	_, err := db.Indexes().CreateOne(
 		context.Background(),

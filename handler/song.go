@@ -49,7 +49,11 @@ func (h *Handler) AddSong(c echo.Context) error {
 	if s.Genre == "" {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid genre")))
 	}
-	s.Artist, err = primitive.ObjectIDFromHex(c.FormValue("artist"))
+	aID, err := primitive.ObjectIDFromHex(c.FormValue("artist"))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("invalid artist")))
+	}
+	_, err = h.artistStore.Find(aID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist not found")))
 	}
