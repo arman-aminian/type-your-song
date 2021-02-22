@@ -51,16 +51,16 @@ func (h *Handler) AddSong(c echo.Context) error {
 	}
 	s.Artist, err = primitive.ObjectIDFromHex(c.FormValue("artist"))
 	if err != nil {
-		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist not found")))
+		//return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist not found")))
 	}
 	s.Duration, err = strconv.Atoi(c.FormValue("duration"))
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid duration")))
+		//return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid duration")))
 	}
 	s.PassedUsers = &[]primitive.ObjectID{}
 	s.Url = c.FormValue("url")
 	if s.Url == "" {
-		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid url")))
+		//return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid url")))
 	}
 	lyrics, err := c.FormFile("lyric")
 	if err != nil {
@@ -89,6 +89,6 @@ func (h *Handler) AddSong(c echo.Context) error {
 	return c.JSON(http.StatusOK, s)
 }
 func calculateScore(size, max, avg int) int {
-	t := (size / 1000) + (max / 300) + (avg / 200)
-	return t / 3 * 100
+	t := float64(size/1000) + float64(max/300) + float64(avg/200)
+	return int(t / 3 * 100)
 }
