@@ -33,3 +33,9 @@ func (gs *GenreStore) Find(id primitive.ObjectID) (model.Genre, error) {
 	err := gs.db.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&r)
 	return r, err
 }
+
+func (gs *GenreStore) Get(field, value string) (model.Genre, error) {
+	var r model.Genre
+	err := gs.db.FindOne(context.TODO(), bson.M{field: value}).Decode(&r)
+	return r, err
+}

@@ -9,4 +9,5 @@ type Store interface {
 	Create(*model.Genre) error
 	Remove(string, string) error
 	Find(primitive.ObjectID) (model.Genre, error)
+	Get(string, string) (model.Genre, error)
 }

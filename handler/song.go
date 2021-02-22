@@ -44,11 +44,15 @@ func (h *Handler) AddSong(c echo.Context) error {
 	}
 	s.Cover, err = utils.SaveToFiles(*cover, "files/cover/", s.ID.Hex())
 
-	s.Genre = c.FormValue("genre")
-	// todo check genre is valid like artist!
+	gName := c.FormValue("genre")
 	if s.Genre == "" {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid genre")))
 	}
+	_, err = h.genreStore.Get("name", gName)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("genre not found")))
+	}
+
 	aID, err := primitive.ObjectIDFromHex(c.FormValue("artist"))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("invalid artist")))
