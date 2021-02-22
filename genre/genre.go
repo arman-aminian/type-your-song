@@ -1,4 +1,4 @@
-package artist
+package genre
 
 import (
 	"github.com/arman-aminian/type-your-song/model"
@@ -6,7 +6,7 @@ import (
 )
 
 type Store interface {
-	Create(*model.Artist) error
+	Create(*model.Genre) error
 	Remove(string, string) error
-	Find(primitive.ObjectID) (model.Artist, error)
+	Find(primitive.ObjectID) (model.Genre, error)
 }
