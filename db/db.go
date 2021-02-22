@@ -48,8 +48,13 @@ func SetupSongsDb(mongoClient *mongo.Client) *mongo.Collection {
 }
 
 func SetupArtistsDb(mongoClient *mongo.Client) *mongo.Collection {
-	songsDB := mongoClient.Database("type-your-song").Collection("artists")
-	return songsDB
+	artistsDB := mongoClient.Database("type-your-song").Collection("artists")
+	return artistsDB
+}
+
+func SetupGenresDb(mongoClient *mongo.Client) *mongo.Collection {
+	genresDB := mongoClient.Database("type-your-song").Collection("genres")
+	return genresDB
 }
 
 func createUniqueIndices(db *mongo.Collection, field string) {

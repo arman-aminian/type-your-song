@@ -18,7 +18,7 @@ func NewGenreStore(db *mongo.Collection) *GenreStore {
 	}
 }
 
-func (gs *GenreStore) Create(s *model.Artist) error {
+func (gs *GenreStore) Create(s *model.Genre) error {
 	_, err := gs.db.InsertOne(context.TODO(), s)
 	return err
 }
