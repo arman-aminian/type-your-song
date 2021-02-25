@@ -237,7 +237,6 @@ func (h *Handler) Follow(c echo.Context) error {
 	}
 	u, err := h.userStore.GetByUsername(c.Param("username"))
 	if err != nil {
-		fmt.Println("inja ", c.Param("username"))
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
 	if u == nil {
@@ -253,7 +252,7 @@ func (h *Handler) Follow(c echo.Context) error {
 	if err := h.userStore.AddFollowing(cu.ID, u.ID); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-	return nil
+	return c.JSON(http.StatusOK, newProfileResponse(cu))
 }
 
 func (h *Handler) Dummy(c echo.Context) error {

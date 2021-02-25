@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/arman-aminian/type-your-song/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type userResponse struct {
@@ -23,13 +24,22 @@ func newUserResponse(u *model.User) *userResponse {
 
 type profileResponse struct {
 	Profile struct {
-		Username string  `json:"username"`
-		Image    *string `json:"image"`
+		Username    string                `json:"username"`
+		Email       string                `json:"email"`
+		Image       string                `json:"image"`
+		PassedSongs *[]model.PassedSong   `json:"passed_songs"`
+		Followings  *[]primitive.ObjectID `json:"followings"`
+		Score       int                   `json:"score"`
 	} `json:"profile"`
 }
 
 func newProfileResponse(u *model.User) *profileResponse {
 	r := new(profileResponse)
 	r.Profile.Username = u.Username
+	r.Profile.Email = u.Email
+	r.Profile.Image = u.Image
+	r.Profile.PassedSongs = u.PassedSongs
+	r.Profile.Followings = u.Followings
+	r.Profile.Score = u.Score
 	return r
 }
