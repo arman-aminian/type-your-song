@@ -58,6 +58,9 @@ func (h *Handler) ConfirmEmail(c echo.Context) error {
 	u.Password = stringFieldFromToken(c, "password")
 	u.HasPassword = true
 	u.IsAdmin = false
+	u.Followings = &[]primitive.ObjectID{}
+	u.PassedSongs = &[]model.PassedSong{}
+	u.Score = 0
 
 	// todo error handling for duplicate click on confirm email
 	if err := h.userStore.Create(&u); err != nil {
@@ -130,6 +133,9 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 	u.ID = primitive.NewObjectID()
 	u.HasPassword = false
 	u.IsAdmin = false
+	u.Followings = &[]primitive.ObjectID{}
+	u.PassedSongs = &[]model.PassedSong{}
+	u.Score = 0
 
 	if err := h.userStore.Create(u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
