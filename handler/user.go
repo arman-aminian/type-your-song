@@ -282,10 +282,11 @@ func (h *Handler) UnFollow(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("doesn't follow the target")))
 	}
 
-	if err := h.userStore.RemoveFollowing(cu.ID, u.ID); err != nil {
+	res, err := h.userStore.RemoveFollowing(cu.ID, u.ID)
+	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-	return c.JSON(http.StatusOK, newProfileResponse(cu))
+	return c.JSON(http.StatusOK, newProfileResponse(&res))
 }
 
 func (h *Handler) Dummy(c echo.Context) error {

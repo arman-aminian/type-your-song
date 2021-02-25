@@ -19,5 +19,5 @@ type Store interface {
 	GetById(primitive.ObjectID) (*model.User, error)
 
 	AddFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error)
-	RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) error
+	RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error)
 }

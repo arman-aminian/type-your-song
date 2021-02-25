@@ -93,10 +93,10 @@ func (us *UserStore) AddFollowing(current primitive.ObjectID, u primitive.Object
 	return *cu, err
 }
 
-func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) error {
+func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error) {
 	cu, err := us.GetById(current)
 	if err != nil {
-		return err
+		return model.User{}, err
 	}
 	newFollowings := &[]primitive.ObjectID{}
 	for _, o := range *cu.Followings {
@@ -106,8 +106,8 @@ func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.Obj
 	}
 	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": current}, bson.M{"$set": bson.M{"followings": newFollowings}})
 	if err != nil {
-		return err
+		return model.User{}, err
 	}
 	cu.Followings = newFollowings
-	return nil
+	return *cu, nil
 }
