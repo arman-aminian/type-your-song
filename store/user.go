@@ -82,3 +82,13 @@ func (us *UserStore) GetById(id primitive.ObjectID) (*model.User, error) {
 	err := us.db.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&u)
 	return &u, err
 }
+
+func (us *UserStore) AddFollowing(current primitive.ObjectID, u primitive.ObjectID) error {
+	cu, err := us.GetById(current)
+	if err != nil {
+		return err
+	}
+	*cu.Followings = append(*cu.Followings, u)
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": current}, bson.M{"$set": bson.M{"followings": cu.Followings}})
+	return err
+}

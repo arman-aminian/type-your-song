@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"github.com/arman-aminian/type-your-song/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -47,11 +46,7 @@ func (gs *GenreStore) AddSong(sID primitive.ObjectID, to string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(g)
-	fmt.Println(g.Songs)
 	*g.Songs = append(*g.Songs, sID)
-	fmt.Println(g)
-	fmt.Println(g.Songs)
 	_, err = gs.db.UpdateOne(context.TODO(), bson.M{"name": to}, bson.M{"$set": bson.M{"songs": g.Songs}})
 	return err
 }

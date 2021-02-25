@@ -17,4 +17,6 @@ type Store interface {
 	GetByEmail(string) (*model.User, error)
 	GetByUsername(string) (*model.User, error)
 	GetById(primitive.ObjectID) (*model.User, error)
+
+	AddFollowing(current primitive.ObjectID, u primitive.ObjectID) error
 }

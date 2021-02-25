@@ -217,6 +217,39 @@ func (h *Handler) ConfirmResetPass(c echo.Context) error {
 	return c.JSON(http.StatusCreated, newUserResponse(u))
 }
 
+func (h *Handler) Follow(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	cu, err := h.userStore.GetById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if cu == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	u, err := h.userStore.GetByUsername(c.Param("username"))
+	if err != nil {
+		fmt.Println("inja ", c.Param("username"))
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	if u.Username == cu.Username {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("can't follow yourself")))
+	}
+	if Contains(*cu.Followings, u.ID) {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("already follows the target")))
+	}
+
+	if err := h.userStore.AddFollowing(cu.ID, u.ID); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	return nil
+}
+
 func (h *Handler) Dummy(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "hello world")
 }
@@ -227,4 +260,16 @@ func stringFieldFromToken(c echo.Context, field string) string {
 		return ""
 	}
 	return field
+}
+
+func Contains(slice []primitive.ObjectID, val primitive.ObjectID) bool {
+	if slice == nil {
+		return true
+	}
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
 }

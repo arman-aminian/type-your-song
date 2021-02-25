@@ -157,7 +157,6 @@ func (h *Handler) AddGenre(c echo.Context) error {
 func (h *Handler) AddArtist(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
 	if err != nil {
-		fmt.Println(err)
 		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
 	}
 	u, err := h.userStore.GetById(id)
