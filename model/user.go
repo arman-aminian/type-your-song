@@ -7,12 +7,16 @@ import (
 )
 
 type User struct {
-	ID          primitive.ObjectID `json:"id" bson:"_id"`
-	Username    string             `json:"username" bson:"username"`
-	Email       string             `json:"email" bson:"email"`
-	Password    string             `json:"password" bson:"password"`
-	HasPassword bool               `json:"has_password" bson:"has_password"`
-	IsAdmin     bool               `json:"is_admin" bson:"is_admin"`
+	ID          primitive.ObjectID    `json:"id" bson:"_id"`
+	Username    string                `json:"username" bson:"username"`
+	Email       string                `json:"email" bson:"email"`
+	Password    string                `json:"password" bson:"password"`
+	HasPassword bool                  `json:"has_password" bson:"has_password"`
+	IsAdmin     bool                  `json:"is_admin" bson:"is_admin"`
+	Cover       string                `json:"cover" bson:"cover"`
+	PassedSongs *[]PassedSong         `json:"passed_songs" bson:"passed_songs"`
+	Followings  *[]primitive.ObjectID `json:"followings" bson:"followings"`
+	Score       int                   `json:"score" bson:"score"`
 }
 
 func NewUser() *User {
