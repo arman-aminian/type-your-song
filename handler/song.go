@@ -95,6 +95,11 @@ func (h *Handler) AddSong(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on parse subtitle")))
 	}
 
+	err = h.genreStore.AddSong(s.ID, gName)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to genre")))
+	}
+
 	return c.JSON(http.StatusOK, s)
 }
 func calculateScore(size, max, avg int) int {
