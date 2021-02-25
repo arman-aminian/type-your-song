@@ -25,7 +25,8 @@ func (h *Handler) Register(v1 *echo.Group) {
 	jwtMiddleware := middleware.JWT(utils.JWTSecret)
 
 	songs := v1.Group("/song", jwtMiddleware)
-	songs.POST("/add", h.AddSong)
+	songs.POST("/add/song", h.AddSong)
+	songs.POST("/add/genre", h.AddGenre)
 
 	dummy := v1.Group("/dummy", jwtMiddleware)
 	dummy.GET("", h.Dummy)

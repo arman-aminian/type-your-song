@@ -15,10 +15,8 @@ import (
 )
 
 func (h *Handler) AddSong(c echo.Context) error {
-	println("user : " + stringFieldFromToken(c, "id"))
 	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
 	if err != nil {
-		fmt.Println(err)
 		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
 	}
 	u, err := h.userStore.GetById(id)
@@ -42,7 +40,7 @@ func (h *Handler) AddSong(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid cover")))
 	}
-	s.Cover, err = utils.SaveToFiles(*cover, "files/cover/", s.ID.Hex())
+	s.Cover, err = utils.SaveToFiles(*cover, "files/songs/cover/", s.ID.Hex())
 
 	gName := c.FormValue("genre")
 	if s.Genre == "" {
@@ -100,4 +98,38 @@ func (h *Handler) AddSong(c echo.Context) error {
 func calculateScore(size, max, avg int) int {
 	t := float64(size/1000) + float64(max/300) + float64(avg/200)
 	return int(t / 3 * 100)
+}
+
+func (h *Handler) AddGenre(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	u, err := h.userStore.GetById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	if !u.IsAdmin {
+		return c.JSON(http.StatusUnauthorized, utils.NewError(errors.New("need admin permission")))
+	}
+
+	var g model.Genre
+	g.Name = c.FormValue("name")
+	if g.Name == "" {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid name")))
+	}
+	cover, err := c.FormFile("cover")
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid cover")))
+	}
+	g.Cover, err = utils.SaveToFiles(*cover, "files/genres/cover/", g.Name)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not save cover")))
+	}
+	g.Songs = &[]primitive.ObjectID{}
+	return c.JSON(http.StatusOK, g)
 }
