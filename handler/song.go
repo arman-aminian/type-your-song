@@ -60,6 +60,7 @@ func (h *Handler) AddSong(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist not found")))
 	}
+	s.Artist = aID
 
 	s.Duration, err = strconv.Atoi(c.FormValue("duration"))
 	if err != nil {
@@ -132,6 +133,10 @@ func (h *Handler) AddGenre(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not save cover")))
 	}
 	g.Songs = &[]primitive.ObjectID{}
+	err = h.genreStore.Create(&g)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not save genre")))
+	}
 	return c.JSON(http.StatusOK, g)
 }
 
