@@ -9,4 +9,5 @@ type Store interface {
 	Create(*model.Artist) error
 	Remove(string, string) error
 	Find(primitive.ObjectID) (model.Artist, error)
+	AddSong(primitive.ObjectID, primitive.ObjectID) error
 }

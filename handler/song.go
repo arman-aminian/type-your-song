@@ -104,6 +104,11 @@ func (h *Handler) AddSong(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to genre")))
 	}
 
+	err = h.artistStore.AddSong(s.ID, aID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to artist"+err.Error())))
+	}
+
 	return c.JSON(http.StatusOK, s)
 }
 func calculateScore(size, max, avg int) int {

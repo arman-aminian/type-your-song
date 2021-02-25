@@ -33,3 +33,14 @@ func (as *ArtistStore) Find(id primitive.ObjectID) (model.Artist, error) {
 	err := as.db.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&r)
 	return r, err
 }
+
+func (as *ArtistStore) AddSong(sID primitive.ObjectID, to primitive.ObjectID) error {
+	var err error
+	a, err := as.Find(to)
+	if err != nil {
+		return err
+	}
+	*a.Songs = append(*a.Songs, sID)
+	_, err = as.db.UpdateOne(context.TODO(), bson.M{"_id": to}, bson.M{"$set": bson.M{"songs": a.Songs}})
+	return err
+}
