@@ -43,13 +43,14 @@ func (h *Handler) AddSong(c echo.Context) error {
 	s.Cover, err = utils.SaveToFiles(*cover, "files/songs/cover/", s.ID.Hex())
 
 	gName := c.FormValue("genre")
-	if s.Genre == "" {
+	if gName == "" {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid genre")))
 	}
 	_, err = h.genreStore.Get("name", gName)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("genre not found")))
+		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("genre not found"+err.Error())))
 	}
+	s.Genre = gName
 
 	aID, err := primitive.ObjectIDFromHex(c.FormValue("artist"))
 	if err != nil {
@@ -132,4 +133,43 @@ func (h *Handler) AddGenre(c echo.Context) error {
 	}
 	g.Songs = &[]primitive.ObjectID{}
 	return c.JSON(http.StatusOK, g)
+}
+
+func (h *Handler) AddArtist(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	u, err := h.userStore.GetById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	if !u.IsAdmin {
+		return c.JSON(http.StatusUnauthorized, utils.NewError(errors.New("need admin permission")))
+	}
+
+	var a model.Artist
+	a.ID = primitive.NewObjectID()
+	a.Name = c.FormValue("name")
+	if a.Name == "" {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid name")))
+	}
+	cover, err := c.FormFile("cover")
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid cover")))
+	}
+	a.Cover, err = utils.SaveToFiles(*cover, "files/artists/cover/", a.ID.Hex())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not save cover")))
+	}
+	a.Songs = &[]primitive.ObjectID{}
+	err = h.artistStore.Create(&a)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not save artist")))
+	}
+	return c.JSON(http.StatusOK, a)
 }

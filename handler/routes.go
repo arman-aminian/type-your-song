@@ -27,6 +27,7 @@ func (h *Handler) Register(v1 *echo.Group) {
 	songs := v1.Group("/song", jwtMiddleware)
 	songs.POST("/add/song", h.AddSong)
 	songs.POST("/add/genre", h.AddGenre)
+	songs.POST("/add/artist", h.AddArtist)
 
 	dummy := v1.Group("/dummy", jwtMiddleware)
 	dummy.GET("", h.Dummy)
