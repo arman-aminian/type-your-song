@@ -40,7 +40,11 @@ func (h *Handler) AddSong(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid cover")))
 	}
-	s.Cover, err = utils.SaveToFiles(*cover, "files/songs/cover/", s.ID.Hex())
+	co, err := utils.SaveToFiles(*cover, "files/songs/cover/", s.ID.Hex())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on save song's cover")))
+	}
+	s.Cover = co
 
 	gName := c.FormValue("genre")
 	if gName == "" {
