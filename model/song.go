@@ -21,3 +21,10 @@ type Song struct {
 	WordsCount int `json:"words_count" bson:"words_count"`
 	Score      int `json:"score" bson:"score"`
 }
+
+type PassedSong struct {
+	SID         primitive.ObjectID `json:"sid" bson:"sid"`
+	PassedLevel string             `json:"passed_level" bson:"passed_level"`
+	Speed       int                `json:"speed" bson:"speed"`
+	Accuracy    int                `json:"accuracy" bson:"accuracy"`
+}
