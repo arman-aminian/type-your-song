@@ -83,12 +83,31 @@ func (us *UserStore) GetById(id primitive.ObjectID) (*model.User, error) {
 	return &u, err
 }
 
-func (us *UserStore) AddFollowing(current primitive.ObjectID, u primitive.ObjectID) error {
+func (us *UserStore) AddFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error) {
+	cu, err := us.GetById(current)
+	if err != nil {
+		return model.User{}, err
+	}
+	*cu.Followings = append(*cu.Followings, u)
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": current}, bson.M{"$set": bson.M{"followings": cu.Followings}})
+	return *cu, err
+}
+
+func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) error {
 	cu, err := us.GetById(current)
 	if err != nil {
 		return err
 	}
-	*cu.Followings = append(*cu.Followings, u)
-	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": current}, bson.M{"$set": bson.M{"followings": cu.Followings}})
-	return err
+	newFollowings := &[]primitive.ObjectID{}
+	for _, o := range *cu.Followings {
+		if o != u {
+			*newFollowings = append(*newFollowings, o)
+		}
+	}
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": current}, bson.M{"$set": bson.M{"followings": newFollowings}})
+	if err != nil {
+		return err
+	}
+	cu.Followings = newFollowings
+	return nil
 }

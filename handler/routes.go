@@ -24,8 +24,9 @@ func (h *Handler) Register(v1 *echo.Group) {
 
 	jwtMiddleware := middleware.JWT(utils.JWTSecret)
 
-	users := v1.Group("/user", jwtMiddleware)
+	users := v1.Group("/users", jwtMiddleware)
 	users.POST("/follow/:username", h.Follow)
+	users.DELETE("/unfollow/:username", h.UnFollow)
 
 	songs := v1.Group("/song", jwtMiddleware)
 	songs.POST("/add/song", h.AddSong)

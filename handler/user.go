@@ -249,7 +249,40 @@ func (h *Handler) Follow(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("already follows the target")))
 	}
 
-	if err := h.userStore.AddFollowing(cu.ID, u.ID); err != nil {
+	res, err := h.userStore.AddFollowing(cu.ID, u.ID)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	return c.JSON(http.StatusOK, newProfileResponse(&res))
+}
+
+func (h *Handler) UnFollow(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	cu, err := h.userStore.GetById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if cu == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	u, err := h.userStore.GetByUsername(c.Param("username"))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	if u.Username == cu.Username {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("can't unfollow yourself")))
+	}
+	if !Contains(*cu.Followings, u.ID) {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("doesn't follow the target")))
+	}
+
+	if err := h.userStore.RemoveFollowing(cu.ID, u.ID); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
 	return c.JSON(http.StatusOK, newProfileResponse(cu))
