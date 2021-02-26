@@ -289,6 +289,11 @@ func (h *Handler) UnFollow(c echo.Context) error {
 	return c.JSON(http.StatusOK, newProfileResponse(&res))
 }
 
+func (h *Handler) GetProfile(c echo.Context) error {
+	jwtId := stringFieldFromToken(c, "id")
+	return c.JSON(http.StatusOK, jwtId)
+}
+
 func (h *Handler) Dummy(c echo.Context) error {
 	return c.JSON(http.StatusCreated, "hello world")
 }
