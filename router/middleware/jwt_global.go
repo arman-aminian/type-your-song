@@ -3,34 +3,27 @@ package middleware
 import (
 	"fmt"
 	"github.com/arman-aminian/type-your-song/utils"
-	"net/http"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 )
 
 type (
-	JWTConfig struct {
-		Skipper    Skipper
+	JWTGlobalConfig struct {
+		Skipper    SkipperGlobal
 		SigningKey interface{}
 	}
-	Skipper      func(c echo.Context) bool
-	jwtExtractor func(echo.Context) (string, error)
+	SkipperGlobal      func(c echo.Context) bool
+	jwtGlobalExtractor func(echo.Context) (string, error)
 )
 
-var (
-	ErrJWTMissing = echo.NewHTTPError(http.StatusUnauthorized, "missing or malformed jwt")
-	ErrJWTInvalid = echo.NewHTTPError(http.StatusForbidden, "invalid or expired jwt")
-)
-
-func JWT(key interface{}) echo.MiddlewareFunc {
-	c := JWTConfig{}
+func JWTGlobal(key interface{}) echo.MiddlewareFunc {
+	c := JWTGlobalConfig{}
 	c.SigningKey = key
-	return JWTWithConfig(c)
+	return JWTGlobalWithConfig(c)
 }
 
-func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
-	extractor := jwtFromHeader("Authorization", "Token")
+func JWTGlobalWithConfig(config JWTGlobalConfig) echo.MiddlewareFunc {
+	extractor := jwtGlobalFromHeader("Authorization", "Token")
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			auth, err := extractor(c)
@@ -40,8 +33,8 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 						return next(c)
 					}
 				}
-				fmt.Println("5")
-				return c.JSON(http.StatusUnauthorized, utils.NewError(err))
+				c.Set("id", utils.Guest)
+				return next(c)
 			}
 			token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -51,24 +44,23 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 				return config.SigningKey, nil
 			})
 			if err != nil {
-				fmt.Println("2")
-				return c.JSON(http.StatusForbidden, utils.NewError(ErrJWTInvalid))
+				c.Set("id", utils.Guest)
+				return next(c)
 			}
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				userID := claims["id"]
 				c.Set("id", userID)
 				fmt.Println("3")
 				return next(c)
-			} else {
-				fmt.Println("4")
 			}
-			return c.JSON(http.StatusForbidden, utils.NewError(ErrJWTInvalid))
+			c.Set("id", utils.Guest)
+			return next(c)
 		}
 	}
 }
 
 // jwtFromHeader returns a `jwtExtractor` that extracts token from the request header.
-func jwtFromHeader(header string, authScheme string) jwtExtractor {
+func jwtGlobalFromHeader(header string, authScheme string) jwtExtractor {
 	return func(c echo.Context) (string, error) {
 		auth := c.Request().Header.Get(header)
 		l := len(authScheme)
