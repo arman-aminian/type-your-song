@@ -38,7 +38,6 @@ func JWTGlobalWithConfig(config JWTGlobalConfig) echo.MiddlewareFunc {
 			}
 			token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					fmt.Println("1")
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
 				return config.SigningKey, nil
@@ -50,7 +49,6 @@ func JWTGlobalWithConfig(config JWTGlobalConfig) echo.MiddlewareFunc {
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				userID := claims["id"]
 				c.Set("id", userID)
-				fmt.Println("3")
 				return next(c)
 			}
 			c.Set("id", utils.Guest)

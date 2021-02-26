@@ -40,27 +40,21 @@ func JWTWithConfig(config JWTConfig) echo.MiddlewareFunc {
 						return next(c)
 					}
 				}
-				fmt.Println("5")
 				return c.JSON(http.StatusUnauthorized, utils.NewError(err))
 			}
 			token, err := jwt.Parse(auth, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					fmt.Println("1")
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
 				return config.SigningKey, nil
 			})
 			if err != nil {
-				fmt.Println("2")
 				return c.JSON(http.StatusForbidden, utils.NewError(ErrJWTInvalid))
 			}
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				userID := claims["id"]
 				c.Set("id", userID)
-				fmt.Println("3")
 				return next(c)
-			} else {
-				fmt.Println("4")
 			}
 			return c.JSON(http.StatusForbidden, utils.NewError(ErrJWTInvalid))
 		}

@@ -286,12 +286,29 @@ func (h *Handler) UnFollow(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-	return c.JSON(http.StatusOK, newProfileResponse(&res))
+	p := newProfileResponse(&res)
+	return c.JSON(http.StatusOK, p)
 }
 
 func (h *Handler) GetProfile(c echo.Context) error {
 	jwtId := stringFieldFromToken(c, "id")
-	return c.JSON(http.StatusOK, jwtId)
+	u, err := h.userStore.GetByUsername(c.Param("username"))
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	p := newProfileResponse(u)
+	if jwtId != utils.Guest {
+		id, err := primitive.ObjectIDFromHex(jwtId)
+		if err == nil {
+			cu, err := h.userStore.GetById(id)
+			if err == nil {
+				if Contains(*cu.Followings, u.ID) {
+					p.Profile.IsFollowed = true
+				}
+			}
+		}
+	}
+	return c.JSON(http.StatusOK, p)
 }
 
 func (h *Handler) Dummy(c echo.Context) error {

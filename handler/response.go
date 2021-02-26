@@ -30,6 +30,7 @@ type profileResponse struct {
 		PassedSongs *[]model.PassedSong   `json:"passed_songs"`
 		Followings  *[]primitive.ObjectID `json:"followings"`
 		Score       int                   `json:"score"`
+		IsFollowed  bool                  `json:"is_followed"`
 	} `json:"profile"`
 }
 
@@ -41,5 +42,6 @@ func newProfileResponse(u *model.User) *profileResponse {
 	r.Profile.PassedSongs = u.PassedSongs
 	r.Profile.Followings = u.Followings
 	r.Profile.Score = u.Score
+	r.Profile.IsFollowed = false
 	return r
 }
