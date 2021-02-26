@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"github.com/arman-aminian/type-your-song/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -25,4 +26,10 @@ func (ss *SongStore) Create(s *model.Song) error {
 func (ss *SongStore) Remove(field, value string) error {
 	_, err := ss.db.DeleteOne(context.TODO(), bson.M{field: value})
 	return err
+}
+
+func (ss *SongStore) GetById(id primitive.ObjectID) (*model.Song, error) {
+	var s model.Song
+	err := ss.db.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&s)
+	return &s, err
 }

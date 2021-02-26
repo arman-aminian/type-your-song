@@ -191,3 +191,47 @@ func (h *Handler) AddArtist(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, a)
 }
+
+func (h *Handler) GetSong(c echo.Context) error {
+	jwtId := stringFieldFromToken(c, "id")
+	sID, err := primitive.ObjectIDFromHex(c.Param("song"))
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("error on song id param")))
+	}
+	s, err := h.songStore.GetById(sID)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	a, err := h.artistStore.Find(s.Artist)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	p := newFullSongResponse(s, a.Name)
+	if jwtId != utils.Guest {
+		id, err := primitive.ObjectIDFromHex(jwtId)
+		if err == nil {
+			cu, err := h.userStore.GetById(id)
+			if err == nil {
+				passed, err := findPassedSong(*cu.PassedSongs, s.ID)
+				if err == nil {
+					p.Song.PassedLevel = passed.PassedLevel
+					p.Song.Speed = passed.Speed
+					p.Song.Accuracy = passed.Accuracy
+				}
+			}
+		}
+	}
+	return c.JSON(http.StatusOK, p)
+}
+
+func findPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.PassedSong, error) {
+	if slice == nil {
+		return model.PassedSong{}, errors.New("null")
+	}
+	for _, item := range slice {
+		if item.SID == val {
+			return item, nil
+		}
+	}
+	return model.PassedSong{}, errors.New("not found")
+}
