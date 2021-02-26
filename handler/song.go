@@ -194,6 +194,7 @@ func (h *Handler) AddArtist(c echo.Context) error {
 
 func (h *Handler) GetSong(c echo.Context) error {
 	jwtId := stringFieldFromToken(c, "id")
+	fmt.Println(jwtId)
 	sID, err := primitive.ObjectIDFromHex(c.Param("song"))
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("error on song id param")))
