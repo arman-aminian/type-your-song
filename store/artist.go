@@ -57,6 +57,6 @@ func (as *ArtistStore) RemoveSong(sID primitive.ObjectID, from primitive.ObjectI
 			*us = append(*us, o)
 		}
 	}
-	_, err = as.db.UpdateOne(context.TODO(), bson.M{"name": from}, bson.M{"$set": bson.M{"songs": us}})
+	_, err = as.db.UpdateOne(context.TODO(), bson.M{"_id": from}, bson.M{"$set": bson.M{"songs": us}})
 	return err
 }
