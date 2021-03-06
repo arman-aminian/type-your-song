@@ -234,6 +234,43 @@ func (h *Handler) AddArtist(c echo.Context) error {
 	return c.JSON(http.StatusOK, a)
 }
 
+func (h *Handler) DeleteArtist(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	u, err := h.userStore.GetById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	if !u.IsAdmin {
+		return c.JSON(http.StatusUnauthorized, utils.NewError(errors.New("need admin permission")))
+	}
+
+	aID, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid id")))
+	}
+	a, err := h.artistStore.Find(aID)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("artist id not found")))
+	}
+	err = h.artistStore.RemoveByID(aID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not remove artist")))
+	}
+	for _, o := range *a.Songs {
+		err = h.songStore.RemoveByID(o)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not delete song id : "+o.Hex())))
+		}
+	}
+	return c.JSON(http.StatusOK, a)
+}
+
 func (h *Handler) GetSong(c echo.Context) error {
 	jwtId := stringFieldFromToken(c, "id")
 	fmt.Println(jwtId)

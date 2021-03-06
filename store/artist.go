@@ -23,8 +23,13 @@ func (as *ArtistStore) Create(s *model.Artist) error {
 	return err
 }
 
-func (as *ArtistStore) Remove(field, value string) error {
+func (as *ArtistStore) RemoveByField(field, value string) error {
 	_, err := as.db.DeleteOne(context.TODO(), bson.M{field: value})
+	return err
+}
+
+func (as *ArtistStore) RemoveByID(id primitive.ObjectID) error {
+	_, err := as.db.DeleteOne(context.TODO(), bson.M{"_id": id})
 	return err
 }
 

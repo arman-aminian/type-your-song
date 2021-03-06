@@ -7,7 +7,8 @@ import (
 
 type Store interface {
 	Create(*model.Artist) error
-	Remove(string, string) error
+	RemoveByField(string, string) error
+	RemoveByID(id primitive.ObjectID) error
 	Find(primitive.ObjectID) (model.Artist, error)
 	AddSong(primitive.ObjectID, primitive.ObjectID) error
 	RemoveSong(primitive.ObjectID, primitive.ObjectID) error
