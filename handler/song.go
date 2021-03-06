@@ -263,9 +263,17 @@ func (h *Handler) DeleteArtist(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not remove artist")))
 	}
 	for _, o := range *a.Songs {
+		s, err := h.songStore.GetById(o)
+		if err != nil {
+			return c.JSON(http.StatusNotFound, utils.NewError(errors.New("song not found")))
+		}
 		err = h.songStore.RemoveByID(o)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not delete song id : "+o.Hex())))
+			return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("could not delete artist id : "+o.Hex())))
+		}
+		err = h.genreStore.RemoveSong(s.ID, s.Genre)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on remove song from genre")))
 		}
 	}
 	return c.JSON(http.StatusOK, a)

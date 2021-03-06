@@ -8,7 +8,7 @@ import (
 
 func (h *Handler) Register(v1 *echo.Group) {
 	guestUsers := v1.Group("/users")
-	guestUsers.POST("", h.SignUp)
+	guestUsers.POST("/signup", h.SignUp)
 	guestUsers.POST("/login", h.Login)
 	guestUsers.GET("/login/google", h.GoogleLogin)
 	guestUsers.GET("/callback", h.GoogleLoginCallback)
@@ -16,7 +16,7 @@ func (h *Handler) Register(v1 *echo.Group) {
 
 	globalJwtMiddleware := middleware.JWTGlobal(utils.JWTSecret)
 	globalUsers := v1.Group("", globalJwtMiddleware)
-	globalUsers.GET("//user:username", h.GetProfile)
+	globalUsers.GET("/user:username", h.GetProfile)
 	globalUsers.GET("/song/:song", h.GetSong)
 
 	confirmEmailJwtMiddleware := middleware.EmailConfirmJWT(utils.JWTSecret)
@@ -38,7 +38,7 @@ func (h *Handler) Register(v1 *echo.Group) {
 	songs.DELETE("/delete/song/:id", h.DeleteSong)
 	songs.POST("/add/genre", h.AddGenre)
 	songs.POST("/add/artist", h.AddArtist)
-	songs.POST("/delete/artist/:id", h.DeleteArtist)
+	songs.DELETE("/delete/artist/:id", h.DeleteArtist)
 
 	dummy := v1.Group("/dummy", jwtMiddleware)
 	dummy.GET("", h.Dummy)

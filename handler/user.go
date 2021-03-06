@@ -19,6 +19,7 @@ import (
 
 func (h *Handler) SignUp(c echo.Context) error {
 	var u model.User
+	fmt.Println("here")
 	req := &userRegisterRequest{}
 	if err := req.bind(c, &u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
@@ -40,7 +41,7 @@ func (h *Handler) SignUp(c echo.Context) error {
 	content := utils.BaseUrl + "/api/confirm?token=" + emailJwt
 	err = email.SendEmail(to, content, "confirm your typeasong account")
 	if err != nil {
-		panic(err)
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on sending email")))
 	}
 
 	return c.JSON(http.StatusCreated, model.Message{Content: "an email sent to you\nconfirm your email address"})
