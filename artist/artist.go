@@ -10,4 +10,5 @@ type Store interface {
 	Remove(string, string) error
 	Find(primitive.ObjectID) (model.Artist, error)
 	AddSong(primitive.ObjectID, primitive.ObjectID) error
+	RemoveSong(primitive.ObjectID, primitive.ObjectID) error
 }

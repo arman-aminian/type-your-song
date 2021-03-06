@@ -50,7 +50,7 @@ func (h *Handler) AddSong(c echo.Context) error {
 	if gName == "" {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("invalid genre")))
 	}
-	_, err = h.genreStore.Get("name", gName)
+	_, err = h.genreStore.GetByField("name", gName)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("genre not found"+err.Error())))
 	}
@@ -136,14 +136,18 @@ func (h *Handler) DeleteSong(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid song id")))
 	}
+	s, err := h.songStore.GetById(songId)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NewError(errors.New("song not found")))
+	}
 	err = h.songStore.RemoveByID(songId)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on remove song")))
 	}
 
-	err = h.genreStore.AddSong(s.ID, gName)
+	err = h.genreStore.RemoveSong(s.ID, s.Genre)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to genre")))
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on remove song from genre")))
 	}
 
 	err = h.artistStore.AddSong(s.ID, aID)

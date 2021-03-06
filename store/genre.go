@@ -23,8 +23,13 @@ func (gs *GenreStore) Create(s *model.Genre) error {
 	return err
 }
 
-func (gs *GenreStore) Remove(field, value string) error {
+func (gs *GenreStore) RemoveByField(field, value string) error {
 	_, err := gs.db.DeleteOne(context.TODO(), bson.M{field: value})
+	return err
+}
+
+func (gs *GenreStore) RemoveByID(id primitive.ObjectID) error {
+	_, err := gs.db.DeleteOne(context.TODO(), bson.M{"_id": id})
 	return err
 }
 
@@ -48,11 +53,27 @@ func (gs *GenreStore) GetByID(id primitive.ObjectID) (model.Genre, error) {
 
 func (gs *GenreStore) AddSong(sID primitive.ObjectID, to string) error {
 	var err error
-	g, err := gs.Get("name", to)
+	g, err := gs.GetByField("name", to)
 	if err != nil {
 		return err
 	}
 	*g.Songs = append(*g.Songs, sID)
 	_, err = gs.db.UpdateOne(context.TODO(), bson.M{"name": to}, bson.M{"$set": bson.M{"songs": g.Songs}})
+	return err
+}
+
+func (gs *GenreStore) RemoveSong(sID primitive.ObjectID, from string) error {
+	var err error
+	g, err := gs.GetByField("name", from)
+	if err != nil {
+		return err
+	}
+	us := &[]primitive.ObjectID{}
+	for _, o := range *g.Songs {
+		if o != sID {
+			*us = append(*us, o)
+		}
+	}
+	_, err = gs.db.UpdateOne(context.TODO(), bson.M{"name": from}, bson.M{"$set": bson.M{"songs": us}})
 	return err
 }

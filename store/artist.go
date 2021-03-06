@@ -44,3 +44,19 @@ func (as *ArtistStore) AddSong(sID primitive.ObjectID, to primitive.ObjectID) er
 	_, err = as.db.UpdateOne(context.TODO(), bson.M{"_id": to}, bson.M{"$set": bson.M{"songs": a.Songs}})
 	return err
 }
+
+func (as *ArtistStore) RemoveSong(sID primitive.ObjectID, from primitive.ObjectID) error {
+	var err error
+	a, err := as.Find(from)
+	if err != nil {
+		return err
+	}
+	us := &[]primitive.ObjectID{}
+	for _, o := range *a.Songs {
+		if o != sID {
+			*us = append(*us, o)
+		}
+	}
+	_, err = as.db.UpdateOne(context.TODO(), bson.M{"name": from}, bson.M{"$set": bson.M{"songs": us}})
+	return err
+}
