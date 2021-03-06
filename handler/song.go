@@ -150,7 +150,7 @@ func (h *Handler) DeleteSong(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on remove song from genre")))
 	}
 
-	err = h.artistStore.AddSong(s.ID, aID)
+	err = h.artistStore.RemoveSong(s.ID, s.Artist)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to artist"+err.Error())))
 	}
