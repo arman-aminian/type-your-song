@@ -9,6 +9,7 @@ type Store interface {
 	Create(*model.Genre) error
 	Remove(string, string) error
 	Find(primitive.ObjectID) (model.Genre, error)
-	Get(string, string) (model.Genre, error)
+	GetByField(string, string) (model.Genre, error)
+	GetByID(id primitive.ObjectID) (model.Genre, error)
 	AddSong(primitive.ObjectID, string) error
 }

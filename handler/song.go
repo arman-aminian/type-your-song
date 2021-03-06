@@ -116,6 +116,44 @@ func calculateScore(size, max, avg int) int {
 	return int(t / 3 * 100)
 }
 
+func (h *Handler) DeleteSong(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+	u, err := h.userStore.GetById(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	if !u.IsAdmin {
+		return c.JSON(http.StatusUnauthorized, utils.NewError(errors.New("need admin permission")))
+	}
+
+	songId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid song id")))
+	}
+	err = h.songStore.RemoveByID(songId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on remove song")))
+	}
+
+	err = h.genreStore.AddSong(s.ID, gName)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to genre")))
+	}
+
+	err = h.artistStore.AddSong(s.ID, aID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(errors.New("error on add song to artist"+err.Error())))
+	}
+
+	return c.JSON(http.StatusOK, s)
+}
+
 func (h *Handler) AddGenre(c echo.Context) error {
 	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
 	if err != nil {

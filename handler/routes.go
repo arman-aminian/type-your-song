@@ -35,6 +35,7 @@ func (h *Handler) Register(v1 *echo.Group) {
 
 	songs := v1.Group("/song", jwtMiddleware)
 	songs.POST("/add/song", h.AddSong)
+	songs.DELETE("/delete/song/:id", h.DeleteSong)
 	songs.POST("/add/genre", h.AddGenre)
 	songs.POST("/add/artist", h.AddArtist)
 

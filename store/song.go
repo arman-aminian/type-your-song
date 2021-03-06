@@ -23,8 +23,13 @@ func (ss *SongStore) Create(s *model.Song) error {
 	return err
 }
 
-func (ss *SongStore) Remove(field, value string) error {
+func (ss *SongStore) RemoveByField(field, value string) error {
 	_, err := ss.db.DeleteOne(context.TODO(), bson.M{field: value})
+	return err
+}
+
+func (ss *SongStore) RemoveByID(id primitive.ObjectID) error {
+	_, err := ss.db.DeleteOne(context.TODO(), bson.M{"_id": id})
 	return err
 }
 
