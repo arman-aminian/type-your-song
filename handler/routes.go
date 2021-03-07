@@ -19,6 +19,7 @@ func (h *Handler) Register(v1 *echo.Group) {
 	globalUsers.GET("/user:username", h.GetProfile)
 	globalUsers.GET("/song/:song", h.GetSong)
 	globalUsers.GET("/genre/:genre", h.GetGenre)
+	globalUsers.GET("/artist/:artist", h.GetArtist)
 
 	confirmEmailJwtMiddleware := middleware.EmailConfirmJWT(utils.JWTSecret)
 	confirmEmail := v1.Group("/confirm", confirmEmailJwtMiddleware)

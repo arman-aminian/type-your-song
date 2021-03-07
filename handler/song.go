@@ -311,6 +311,18 @@ func (h *Handler) GetSong(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
+func (h *Handler) GetArtist(c echo.Context) error {
+	aID, err := primitive.ObjectIDFromHex(c.Param("artist"))
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("error on artist id param")))
+	}
+	a, err := h.artistStore.Find(aID)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	return c.JSON(http.StatusOK, newArtistResponse(&a))
+}
+
 func (h *Handler) GetGenre(c echo.Context) error {
 	gN := c.Param("genre")
 	if gN == "" {

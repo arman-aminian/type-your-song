@@ -105,3 +105,21 @@ func newGenreResponse(g *model.Genre) *genreResponse {
 	r.Genre.Cover = g.Cover
 	return r
 }
+
+type artistResponse struct {
+	Artist struct {
+		ID    primitive.ObjectID    `json:"_id"`
+		Name  string                `json:"name"`
+		Cover string                `json:"cover"`
+		Songs *[]primitive.ObjectID `json:"songs"`
+	}
+}
+
+func newArtistResponse(a *model.Artist) *artistResponse {
+	r := new(artistResponse)
+	r.Artist.Cover = a.Cover
+	r.Artist.Name = a.Name
+	r.Artist.Songs = a.Songs
+	r.Artist.ID = a.ID
+	return r
+}
