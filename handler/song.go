@@ -281,7 +281,6 @@ func (h *Handler) DeleteArtist(c echo.Context) error {
 
 func (h *Handler) GetSong(c echo.Context) error {
 	jwtId := stringFieldFromToken(c, "id")
-	fmt.Println(jwtId)
 	sID, err := primitive.ObjectIDFromHex(c.Param("song"))
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(errors.New("error on song id param")))
@@ -310,6 +309,18 @@ func (h *Handler) GetSong(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, p)
+}
+
+func (h *Handler) GetGenre(c echo.Context) error {
+	gN := c.Param("genre")
+	if gN == "" {
+		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("null genre")))
+	}
+	g, err := h.genreStore.GetByField("name", gN)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	return c.JSON(http.StatusOK, newGenreResponse(&g))
 }
 
 func findPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.PassedSong, error) {

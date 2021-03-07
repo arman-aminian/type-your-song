@@ -89,3 +89,19 @@ func newFullSongResponse(s *model.Song, artist string) *fullSongResponse {
 	r.Song.Score = s.Score
 	return r
 }
+
+type genreResponse struct {
+	Genre struct {
+		Name  string                `json:"name"`
+		Cover string                `json:"cover"`
+		Songs *[]primitive.ObjectID `json:"songs"`
+	}
+}
+
+func newGenreResponse(g *model.Genre) *genreResponse {
+	r := new(genreResponse)
+	r.Genre.Songs = g.Songs
+	r.Genre.Name = g.Name
+	r.Genre.Cover = g.Cover
+	return r
+}
