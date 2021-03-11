@@ -147,6 +147,8 @@ func newFullSongsResponse(songs *[]model.Song, store artist.Store, cu *model.Use
 				r[i].PassedLevel = passed.PassedLevel
 				r[i].Speed = passed.Speed
 				r[i].Accuracy = passed.Accuracy
+			} else {
+				r[i].PassedLevel = utils.NotPassed
 			}
 		} else {
 			r[i].PassedLevel = utils.NotPassed
