@@ -335,6 +335,14 @@ func (h *Handler) GetGenre(c echo.Context) error {
 	return c.JSON(http.StatusOK, newGenreResponse(&g))
 }
 
+func (h *Handler) GetGenres(c echo.Context) error {
+	g, err := h.genreStore.GetAll()
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+	return c.JSON(http.StatusOK, newGenresResponse(&g))
+}
+
 func findPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.PassedSong, error) {
 	if slice == nil {
 		return model.PassedSong{}, errors.New("null")

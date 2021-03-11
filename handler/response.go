@@ -106,6 +106,16 @@ func newGenreResponse(g *model.Genre) *genreResponse {
 	return r
 }
 
+type genresResonse struct {
+	Genres []model.Genre `json:"genres"`
+}
+
+func newGenresResponse(g *[]model.Genre) *genresResonse {
+	r := new(genresResonse)
+	r.Genres = *g
+	return r
+}
+
 type artistResponse struct {
 	Artist struct {
 		ID    primitive.ObjectID    `json:"_id"`

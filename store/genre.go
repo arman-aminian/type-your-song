@@ -51,6 +51,18 @@ func (gs *GenreStore) GetByID(id primitive.ObjectID) (model.Genre, error) {
 	return r, err
 }
 
+func (gs *GenreStore) GetAll() ([]model.Genre, error) {
+	var r []model.Genre
+	cursor, err := gs.db.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	if err = cursor.All(context.TODO(), &r); err != nil {
+		return nil, err
+	}
+	return r, err
+}
+
 func (gs *GenreStore) AddSong(sID primitive.ObjectID, to string) error {
 	var err error
 	g, err := gs.GetByField("name", to)

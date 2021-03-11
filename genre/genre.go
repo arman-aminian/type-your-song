@@ -14,4 +14,5 @@ type Store interface {
 	GetByID(id primitive.ObjectID) (model.Genre, error)
 	AddSong(primitive.ObjectID, string) error
 	RemoveSong(primitive.ObjectID, string) error
+	GetAll() ([]model.Genre, error)
 }
