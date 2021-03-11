@@ -38,3 +38,16 @@ func (ss *SongStore) GetById(id primitive.ObjectID) (*model.Song, error) {
 	err := ss.db.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&s)
 	return &s, err
 }
+
+func (ss *SongStore) GetSongs(ids []primitive.ObjectID) (*[]model.Song, error) {
+	var result []model.Song
+	query := bson.M{"_id": bson.M{"$in": ids}}
+	res, err := ss.db.Find(context.TODO(), query)
+	if err != nil {
+		return nil, err
+	}
+	if err = res.All(context.TODO(), &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}

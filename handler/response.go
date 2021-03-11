@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/arman-aminian/gosub/parsers"
+	"github.com/arman-aminian/type-your-song/artist"
 	"github.com/arman-aminian/type-your-song/model"
 	"github.com/arman-aminian/type-your-song/utils"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -68,7 +69,7 @@ type fullSongResponse struct {
 		PassedLevel string `json:"passed_level"`
 		Speed       int    `json:"speed"`
 		Accuracy    int    `json:"accuracy"`
-	}
+	} `json:"song"`
 }
 
 func newFullSongResponse(s *model.Song, artist string) *fullSongResponse {
@@ -88,6 +89,71 @@ func newFullSongResponse(s *model.Song, artist string) *fullSongResponse {
 	r.Song.WordsCount = s.WordsCount
 	r.Song.Score = s.Score
 	return r
+}
+
+type SongInformation struct {
+	ID         primitive.ObjectID `json:"id"`
+	Name       string             `json:"name"`
+	Cover      string             `json:"cover"`
+	Genre      string             `json:"genre"`
+	ArtistID   primitive.ObjectID `json:"artist_id"`
+	ArtistName string             `json:"artist_name"`
+	Duration   int                `json:"duration"`
+	//PassedUsers *[]primitive.ObjectID `json:"passed_users"`
+	Url string `json:"url"`
+	//Lyrics      parsers.Srt           `json:"lyrics"`
+
+	MaxWPM     int `json:"max_wpm"`
+	AvgWPM     int `json:"avg_wpm"`
+	WordsCount int `json:"words_count"`
+	Score      int `json:"score"`
+
+	PassedLevel string `json:"passed_level"`
+	Speed       int    `json:"speed"`
+	Accuracy    int    `json:"accuracy"`
+}
+
+type fullSongsResponse struct {
+	Songs []SongInformation `json:"songs"`
+}
+
+func newFullSongsResponse(songs *[]model.Song, store artist.Store, cu *model.User) *fullSongsResponse {
+	r := make([]SongInformation, len(*songs))
+	if songs == nil {
+		return &fullSongsResponse{r}
+	}
+
+	for i, s := range *songs {
+		r[i].ID = s.ID
+		r[i].Name = s.Name
+		r[i].Cover = s.Cover
+		r[i].Genre = s.Genre
+		r[i].ArtistID = s.Artist
+		r[i].Duration = s.Duration
+		//r[i].PassedUsers = s.PassedUsers
+		r[i].Url = s.Url
+		//r[i].Lyrics = s.Lyrics
+		r[i].MaxWPM = s.MaxWPM
+		r[i].AvgWPM = s.AvgWPM
+		r[i].WordsCount = s.WordsCount
+		r[i].Score = s.Score
+
+		a, _ := store.Find(s.Artist)
+		r[i].ArtistName = a.Name
+
+		if cu != nil {
+			passed, err := findPassedSong(*cu.PassedSongs, s.ID)
+			if err == nil {
+				r[i].PassedLevel = passed.PassedLevel
+				r[i].Speed = passed.Speed
+				r[i].Accuracy = passed.Accuracy
+			}
+		} else {
+			r[i].PassedLevel = utils.NotPassed
+		}
+	}
+
+	return &fullSongsResponse{r}
 }
 
 type genreResponse struct {

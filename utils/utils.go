@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	BaseUrl = "127.0.0.1:8080"
-	Guest   = "guest"
+	BaseUrl   = "127.0.0.1:8080"
+	Guest     = "guest"
+	NotPassed = "none"
 )
 
 func SaveToFiles(f multipart.FileHeader, path string, name string) (string, error) {

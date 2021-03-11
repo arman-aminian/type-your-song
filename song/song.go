@@ -10,4 +10,5 @@ type Store interface {
 	RemoveByField(field, value string) error
 	RemoveByID(id primitive.ObjectID) error
 	GetById(id primitive.ObjectID) (*model.Song, error)
+	GetSongs(ids []primitive.ObjectID) (*[]model.Song, error)
 }

@@ -311,6 +311,37 @@ func (h *Handler) GetSong(c echo.Context) error {
 	return c.JSON(http.StatusOK, p)
 }
 
+func (h *Handler) GetSongs(c echo.Context) error {
+	jwtId := stringFieldFromToken(c, "id")
+
+	req := &songsIDRequest{}
+	if err := req.bind(c); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+
+	songs, err := h.songStore.GetSongs(req.Songs)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, utils.NotFound())
+	}
+
+	loggedIn := false
+	var response *fullSongsResponse
+	if jwtId != utils.Guest {
+		id, err := primitive.ObjectIDFromHex(jwtId)
+		if err == nil {
+			cu, err := h.userStore.GetById(id)
+			if err == nil {
+				loggedIn = true
+				response = newFullSongsResponse(songs, h.artistStore, cu)
+			}
+		}
+	}
+	if !loggedIn {
+		response = newFullSongsResponse(songs, h.artistStore, nil)
+	}
+	return c.JSON(http.StatusOK, response)
+}
+
 func (h *Handler) GetArtist(c echo.Context) error {
 	aID, err := primitive.ObjectIDFromHex(c.Param("artist"))
 	if err != nil {

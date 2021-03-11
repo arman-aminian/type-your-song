@@ -72,7 +72,16 @@ func (r *resetPasswordRequest) bind(c echo.Context) error {
 }
 
 //************************ songs ************************
-//type addSongRequest struct {
-//	Url	string `json:"url"`
-//
-//}
+type songsIDRequest struct {
+	Songs []primitive.ObjectID `json:"songs"`
+}
+
+func (r *songsIDRequest) bind(c echo.Context) error {
+	if err := c.Bind(r); err != nil {
+		return err
+	}
+	if err := c.Validate(r); err != nil {
+		return err
+	}
+	return nil
+}
