@@ -111,3 +111,14 @@ func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.Obj
 	cu.Followings = newFollowings
 	return *cu, nil
 }
+
+func (us *UserStore) Record(uid primitive.ObjectID, passed model.PassedSong) error {
+	u, err := us.GetById(uid)
+	if err != nil {
+		return err
+	}
+
+	*u.PassedSongs = append(*u.PassedSongs, passed)
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": u.PassedSongs}})
+	return err
+}

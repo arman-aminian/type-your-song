@@ -20,4 +20,6 @@ type Store interface {
 
 	AddFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error)
 	RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error)
+
+	Record(uid primitive.ObjectID, passed model.PassedSong) error
 }

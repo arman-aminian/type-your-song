@@ -85,3 +85,20 @@ func (r *songsIDRequest) bind(c echo.Context) error {
 	}
 	return nil
 }
+
+type recordRequest struct {
+	SID         primitive.ObjectID `json:"sid"`
+	PassedLevel string             `json:"passed_level"`
+	Speed       int                `json:"speed"`
+	Accuracy    int                `json:"accuracy"`
+}
+
+func (r *recordRequest) bind(c echo.Context) error {
+	if err := c.Bind(r); err != nil {
+		return err
+	}
+	if err := c.Validate(r); err != nil {
+		return err
+	}
+	return nil
+}

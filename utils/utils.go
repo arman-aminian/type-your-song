@@ -11,7 +11,17 @@ const (
 	BaseUrl   = "127.0.0.1:8080"
 	Guest     = "guest"
 	NotPassed = "none"
+	Simple    = "simple"
+	Medium    = "medium"
+	Hard      = "hard"
 )
+
+func ValidPassedLevel(s string) bool {
+	if s == Simple || s == Medium || s == Hard {
+		return true
+	}
+	return false
+}
 
 func SaveToFiles(f multipart.FileHeader, path string, name string) (string, error) {
 	src, err := f.Open()

@@ -37,6 +37,9 @@ func (h *Handler) Register(v1 *echo.Group) {
 	users.POST("/follow/:username", h.Follow)
 	users.DELETE("/unfollow/:username", h.UnFollow)
 
+	userAction := v1.Group("", jwtMiddleware)
+	userAction.POST("/record", h.Record)
+
 	songs := v1.Group("/song", jwtMiddleware)
 	songs.POST("/add/song", h.AddSong)
 	songs.DELETE("/delete/song/:id", h.DeleteSong)

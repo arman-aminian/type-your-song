@@ -112,7 +112,6 @@ func (h *Handler) GoogleLogin(c echo.Context) error {
 func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 	content, err := getUserInfo(c.FormValue("state"), c.FormValue("code"))
 	if err != nil {
-		fmt.Println(err.Error())
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 
@@ -127,7 +126,7 @@ func (h *Handler) GoogleLoginCallback(c echo.Context) error {
 		return c.JSON(http.StatusOK, newUserResponse(u))
 	}
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	u.Email = req.Email
 	u.Username = strings.Split(u.Email, "@")[0]
@@ -310,6 +309,35 @@ func (h *Handler) GetProfile(c echo.Context) error {
 		}
 	}
 	return c.JSON(http.StatusOK, p)
+}
+
+func (h *Handler) Record(c echo.Context) error {
+	id, err := primitive.ObjectIDFromHex(stringFieldFromToken(c, "id"))
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+
+	req := &recordRequest{}
+	if err := req.bind(c); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	if !utils.ValidPassedLevel(req.PassedLevel) {
+		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid passed level")))
+	}
+
+	var passed model.PassedSong
+	passed.SID = req.SID
+	passed.Accuracy = req.Accuracy
+	passed.Speed = req.Speed
+	passed.PassedLevel = req.PassedLevel
+
+	err = h.userStore.Record(id, passed)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
+	}
+
+	u, err := h.userStore.GetById(id)
+	return c.JSON(http.StatusOK, newProfileResponse(u))
 }
 
 func (h *Handler) Dummy(c echo.Context) error {
