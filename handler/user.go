@@ -327,8 +327,6 @@ func (h *Handler) Record(c echo.Context) error {
 	if req.Speed < 0 || req.Accuracy < 0 || req.Accuracy > 100 {
 		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid speed/accuracy")))
 	}
-	u, err := h.userStore.GetById(id)
-
 	_, err = h.songStore.GetById(req.SID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("song not found")))
@@ -345,7 +343,7 @@ func (h *Handler) Record(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
 
-	u, err = h.userStore.GetById(id)
+	u, err := h.userStore.GetById(id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}

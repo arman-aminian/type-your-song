@@ -58,3 +58,17 @@ func FindPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.Pas
 	}
 	return model.PassedSong{}, errors.New("not found")
 }
+
+func LevelToNum(l string) int {
+	if l == NotPassed {
+		return 1
+	} else if l == Simple {
+		return 2
+	} else if l == Medium {
+		return 3
+	} else if l == Hard {
+		return 4
+	} else {
+		return 0
+	}
+}

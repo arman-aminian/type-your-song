@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"github.com/arman-aminian/type-your-song/model"
+	"github.com/arman-aminian/type-your-song/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -118,7 +119,36 @@ func (us *UserStore) Record(uid primitive.ObjectID, passed model.PassedSong) err
 		return err
 	}
 
-	*u.PassedSongs = append(*u.PassedSongs, passed)
-	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": u.PassedSongs}})
+	ps := *u.PassedSongs
+	checked := false
+	for i, p := range ps {
+		if p.SID == passed.SID {
+			checked = true
+			if utils.LevelToNum(p.PassedLevel) < utils.LevelToNum(passed.PassedLevel) {
+				ps = append(ps[:i], ps[i+1:]...)
+				ps = append(ps, passed)
+				_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": &ps}})
+				break
+			} else if utils.LevelToNum(p.PassedLevel) == utils.LevelToNum(passed.PassedLevel) {
+				if p.Speed < passed.Speed {
+					ps = append(ps[:i], ps[i+1:]...)
+					ps = append(ps, passed)
+					_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": &ps}})
+					break
+				} else if p.Speed == passed.Speed {
+					if p.Accuracy < passed.Accuracy {
+						ps = append(ps[:i], ps[i+1:]...)
+						ps = append(ps, passed)
+						_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": &ps}})
+						break
+					}
+				}
+			}
+		}
+	}
+	if !checked {
+		*u.PassedSongs = append(*u.PassedSongs, passed)
+		_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": u.PassedSongs}})
+	}
 	return err
 }
