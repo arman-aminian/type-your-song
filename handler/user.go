@@ -324,6 +324,13 @@ func (h *Handler) Record(c echo.Context) error {
 	if !utils.ValidPassedLevel(req.PassedLevel) {
 		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid passed level")))
 	}
+	if req.Speed < 0 || req.Accuracy < 0 || req.Accuracy > 100 {
+		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid speed/accuracy")))
+	}
+	_, err = h.songStore.GetById(req.SID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("song not found")))
+	}
 
 	var passed model.PassedSong
 	passed.SID = req.SID
