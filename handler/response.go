@@ -142,7 +142,7 @@ func newFullSongsResponse(songs *[]model.Song, store artist.Store, cu *model.Use
 		r[i].ArtistName = a.Name
 
 		if cu != nil {
-			passed, err := findPassedSong(*cu.PassedSongs, s.ID)
+			passed, err := utils.FindPassedSong(*cu.PassedSongs, s.ID)
 			if err == nil {
 				r[i].PassedLevel = passed.PassedLevel
 				r[i].Speed = passed.Speed

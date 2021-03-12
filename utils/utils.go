@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"errors"
+	"github.com/arman-aminian/type-your-song/model"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"io"
 	"mime/multipart"
 	"os"
@@ -42,4 +45,16 @@ func SaveToFiles(f multipart.FileHeader, path string, name string) (string, erro
 		return "", err
 	}
 	return mediaPath, nil
+}
+
+func FindPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.PassedSong, error) {
+	if slice == nil {
+		return model.PassedSong{}, errors.New("null")
+	}
+	for _, item := range slice {
+		if item.SID == val {
+			return item, nil
+		}
+	}
+	return model.PassedSong{}, errors.New("not found")
 }

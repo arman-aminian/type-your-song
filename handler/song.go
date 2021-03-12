@@ -299,7 +299,7 @@ func (h *Handler) GetSong(c echo.Context) error {
 		if err == nil {
 			cu, err := h.userStore.GetById(id)
 			if err == nil {
-				passed, err := findPassedSong(*cu.PassedSongs, s.ID)
+				passed, err := utils.FindPassedSong(*cu.PassedSongs, s.ID)
 				if err == nil {
 					p.Song.PassedLevel = passed.PassedLevel
 					p.Song.Speed = passed.Speed
@@ -372,16 +372,4 @@ func (h *Handler) GetGenres(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, utils.NotFound())
 	}
 	return c.JSON(http.StatusOK, newGenresResponse(&g))
-}
-
-func findPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.PassedSong, error) {
-	if slice == nil {
-		return model.PassedSong{}, errors.New("null")
-	}
-	for _, item := range slice {
-		if item.SID == val {
-			return item, nil
-		}
-	}
-	return model.PassedSong{}, errors.New("not found")
 }
