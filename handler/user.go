@@ -338,11 +338,11 @@ func (h *Handler) Record(c echo.Context) error {
 	passed.Speed = req.Speed
 	passed.PassedLevel = req.PassedLevel
 
-	//score, err := h.userStore.Record(id, passed, s)
-	////todo add score
+	score, err := h.userStore.Record(id, passed, s)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
+	err = h.userStore.addScore()
 
 	u, err := h.userStore.GetById(id)
 	if err != nil {

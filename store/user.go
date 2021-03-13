@@ -113,6 +113,16 @@ func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.Obj
 	return *cu, nil
 }
 
+func (us *UserStore) addScore(uid primitive.ObjectID, score int) error {
+	u, err := us.GetById(uid)
+	if err != nil {
+		return err
+	}
+	u.Score = u.Score + score
+	_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"score": u.Score}})
+	return err
+}
+
 func (us *UserStore) Record(uid primitive.ObjectID, passed model.PassedSong, s *model.Song) (int, error) {
 	u, err := us.GetById(uid)
 	if err != nil {
