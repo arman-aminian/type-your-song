@@ -327,7 +327,7 @@ func (h *Handler) Record(c echo.Context) error {
 	if req.Speed < 0 || req.Accuracy < 0 || req.Accuracy > 100 {
 		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("invalid speed/accuracy")))
 	}
-	_, err = h.songStore.GetById(req.SID)
+	s, err := h.songStore.GetById(req.SID)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(errors.New("song not found")))
 	}
@@ -338,7 +338,8 @@ func (h *Handler) Record(c echo.Context) error {
 	passed.Speed = req.Speed
 	passed.PassedLevel = req.PassedLevel
 
-	err = h.userStore.Record(id, passed)
+	//score, err := h.userStore.Record(id, passed, s)
+	////todo add score
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}

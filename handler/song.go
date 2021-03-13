@@ -92,7 +92,7 @@ func (h *Handler) AddSong(c echo.Context) error {
 	s.WordsCount = parsers.TotalWordCount(srt)
 	s.MaxWPM = parsers.CalculateMaxWpm(srt, 0, srt.Size)
 	s.AvgWPM = parsers.CalculateMeanWpm(srt, 0, srt.Size)
-	s.Score = calculateScore(s.WordsCount, s.MaxWPM, s.AvgWPM)
+	s.Score = utils.CalculateScore(s.WordsCount, s.MaxWPM, s.AvgWPM, utils.LevelToNum(utils.Hard))
 
 	err = h.songStore.Create(&s)
 	if err != nil {
@@ -110,10 +110,6 @@ func (h *Handler) AddSong(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, s)
-}
-func calculateScore(size, max, avg int) int {
-	t := float64(size/1000) + float64(max/300) + float64(avg/200)
-	return int(t / 3 * 100)
 }
 
 func (h *Handler) DeleteSong(c echo.Context) error {

@@ -60,15 +60,18 @@ func FindPassedSong(slice []model.PassedSong, val primitive.ObjectID) (model.Pas
 }
 
 func LevelToNum(l string) int {
-	if l == NotPassed {
+	if l == Simple {
 		return 1
-	} else if l == Simple {
-		return 2
 	} else if l == Medium {
-		return 3
+		return 2
 	} else if l == Hard {
-		return 4
+		return 3
 	} else {
 		return 0
 	}
+}
+
+func CalculateScore(size, max, avg int, level int) int {
+	t := float64(size/1000) + float64(max/300) + float64(avg/200)
+	return int(t/3*100) * level / 3
 }

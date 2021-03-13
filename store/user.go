@@ -113,30 +113,34 @@ func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.Obj
 	return *cu, nil
 }
 
-func (us *UserStore) Record(uid primitive.ObjectID, passed model.PassedSong) error {
+func (us *UserStore) Record(uid primitive.ObjectID, passed model.PassedSong, s *model.Song) (int, error) {
 	u, err := us.GetById(uid)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
+	score := 0
 	ps := *u.PassedSongs
 	checked := false
 	for i, p := range ps {
 		if p.SID == passed.SID {
 			checked = true
 			if utils.LevelToNum(p.PassedLevel) < utils.LevelToNum(passed.PassedLevel) {
+				score = calculateCurrentScore(s, passed) - calculateCurrentScore(s, p)
 				ps = append(ps[:i], ps[i+1:]...)
 				ps = append(ps, passed)
 				_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": &ps}})
 				break
 			} else if utils.LevelToNum(p.PassedLevel) == utils.LevelToNum(passed.PassedLevel) {
 				if p.Speed < passed.Speed {
+					score = calculateCurrentScore(s, passed) - calculateCurrentScore(s, p)
 					ps = append(ps[:i], ps[i+1:]...)
 					ps = append(ps, passed)
 					_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": &ps}})
 					break
 				} else if p.Speed == passed.Speed {
 					if p.Accuracy < passed.Accuracy {
+						score = calculateCurrentScore(s, passed) - calculateCurrentScore(s, p)
 						ps = append(ps[:i], ps[i+1:]...)
 						ps = append(ps, passed)
 						_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": &ps}})
@@ -147,8 +151,19 @@ func (us *UserStore) Record(uid primitive.ObjectID, passed model.PassedSong) err
 		}
 	}
 	if !checked {
+		score = calculateCurrentScore(s, passed)
 		*u.PassedSongs = append(*u.PassedSongs, passed)
 		_, err = us.db.UpdateOne(context.TODO(), bson.M{"_id": uid}, bson.M{"$set": bson.M{"passed_songs": u.PassedSongs}})
 	}
-	return err
+	if score < 0 {
+		score = 0
+	}
+	return score, err
+}
+func calculateCurrentScore(s *model.Song, p model.PassedSong) int {
+	score := utils.CalculateScore(s.WordsCount, s.MaxWPM, s.AvgWPM, utils.LevelToNum(p.PassedLevel))
+	if p.PassedLevel == utils.Simple {
+		score = score * p.Speed * p.Accuracy / 100 / s.AvgWPM
+	}
+	return score
 }
