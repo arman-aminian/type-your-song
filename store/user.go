@@ -113,7 +113,7 @@ func (us *UserStore) RemoveFollowing(current primitive.ObjectID, u primitive.Obj
 	return *cu, nil
 }
 
-func (us *UserStore) addScore(uid primitive.ObjectID, score int) error {
+func (us *UserStore) AddScore(uid primitive.ObjectID, score int) error {
 	u, err := us.GetById(uid)
 	if err != nil {
 		return err

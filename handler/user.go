@@ -342,7 +342,7 @@ func (h *Handler) Record(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
-	err = h.userStore.addScore()
+	err = h.userStore.AddScore(id, score)
 
 	u, err := h.userStore.GetById(id)
 	if err != nil {

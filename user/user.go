@@ -22,5 +22,5 @@ type Store interface {
 	RemoveFollowing(current primitive.ObjectID, u primitive.ObjectID) (model.User, error)
 
 	Record(uid primitive.ObjectID, passed model.PassedSong, s *model.Song) (int, error)
-	addScore(uid primitive.ObjectID, score int) error
+	AddScore(uid primitive.ObjectID, score int) error
 }
