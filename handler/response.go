@@ -99,9 +99,7 @@ type SongInformation struct {
 	ArtistID   primitive.ObjectID `json:"artist_id"`
 	ArtistName string             `json:"artist_name"`
 	Duration   int                `json:"duration"`
-	//PassedUsers *[]primitive.ObjectID `json:"passed_users"`
-	Url string `json:"url"`
-	//Lyrics      parsers.Srt           `json:"lyrics"`
+	Url        string             `json:"url"`
 
 	MaxWPM     int `json:"max_wpm"`
 	AvgWPM     int `json:"avg_wpm"`

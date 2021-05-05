@@ -19,17 +19,6 @@ type User struct {
 	Score       int                   `json:"score" bson:"score"`
 }
 
-func NewUser() *User {
-	var u User
-	//u.Name = "Twitter User "
-	//u.Tweets = &[]primitive.ObjectID{}
-	//u.Followings = &[]Owner{}
-	//u.Followers = &[]Owner{}
-	//u.Notifications = &[]Event{}
-	//u.Logs = &[]Event{}
-	return &u
-}
-
 func (u *User) HashPassword(plain string) (string, error) {
 	if len(plain) == 0 {
 		return "", errors.New("password should not be empty")
