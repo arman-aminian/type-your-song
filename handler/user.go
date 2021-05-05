@@ -19,7 +19,6 @@ import (
 
 func (h *Handler) SignUp(c echo.Context) error {
 	var u model.User
-	fmt.Println("here")
 	req := &userRegisterRequest{}
 	if err := req.bind(c, &u); err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
