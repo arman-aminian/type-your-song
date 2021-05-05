@@ -12,20 +12,6 @@ import (
 )
 
 func main() {
-	//
-	//r.GET("/swagger/*", echoSwagger.WrapHandler)
-	//
-	//
-
-	//to := []string{
-	//	"arman.aminian78@gmail.com",
-	//}
-	//content := "https://github.com"
-	//err := email.SendEmail(to, content, "confirm your typeasong account")
-	//if err != nil {
-	//	panic(err)
-	//}
-
 	r := router.New()
 	v1 := r.Group("/api")
 	mongoClient, err := db.GetMongoClient()
