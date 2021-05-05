@@ -31,7 +31,6 @@ func ResetPassJWT(key interface{}) echo.MiddlewareFunc {
 }
 
 func ResetPassJWTWithConfig(config ResetPassJWTConfig) echo.MiddlewareFunc {
-	//extractor := jwtFromHeader("Authorization", "Token")
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			auth := c.QueryParam("token")
