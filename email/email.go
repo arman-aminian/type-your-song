@@ -13,11 +13,6 @@ func SendEmail(to []string, text, subject string) error {
 	from := "typeyoursong@gmail.com"
 	password := secure.EmailPassword
 
-	// Receiver email address.
-	//to := []string{
-	//	"sender@example.com",
-	//}
-
 	// smtp server configuration.
 	smtpHost := "smtp.gmail.com"
 	smtpPort := "587"
